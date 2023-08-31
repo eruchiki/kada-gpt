@@ -8,27 +8,6 @@ RUN apt-get update && apt-get install -y \
 &&  rm -rf /var/lib/apt/lists/*
 
 ENV TZ=Asia/Tokyo
-
+COPY requirements.txt /root/
 RUN python3 -m pip install --upgrade pip \
-&&  pip install --no-cache-dir \
-    jupyterlab \
-    jupyterlab-language-pack-ja-jp \
-    black \
-    jupyterlab_code_formatter \
-    jupyterlab-git \
-    jupyterlab_widgets \
-    ipywidgets \
-    import-ipynb
-
-RUN pip install --no-cache-dir \
-    numpy \
-    pandas \
-    scipy \
-    scikit-learn \
-    matplotlib \
-    seaborn \
-    requests \
-    beautifulsoup4 \
-    Pillow \
-    opencv-python \
-    llama-index
+&&  pip install --no-cache-dir -r /root/requirements.txt
