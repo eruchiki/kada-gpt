@@ -14,5 +14,6 @@ matplotlib
 seaborn 
 requests 
 beautifulsoup4 
-llama-index
 openai
+llama-index
+qdrant-client

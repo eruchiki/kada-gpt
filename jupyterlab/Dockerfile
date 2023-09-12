@@ -10,4 +10,5 @@ RUN apt-get update && apt-get install -y \
 ENV TZ=Asia/Tokyo
 COPY requirements.txt /root/
 RUN python3 -m pip install --upgrade pip \
-&&  pip install --no-cache-dir -r /root/requirements.txt
+&&  pip install --no-cache-dir -r /root/requirements.txt \
+&&  rm -f /root/requirements.txt

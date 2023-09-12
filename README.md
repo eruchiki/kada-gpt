@@ -1,1 +1,1 @@
-# kida-gpt
+# kada-gpt
