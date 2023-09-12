@@ -8,6 +8,7 @@ chatGPTを用いた組織内文書検索，対話を実現するプロジェク�
   - Windows
   - macOS(Intel & Apple silicon)
   - Linux
+- OpenAI API key
 
 ## Usage
 ### 初回セットアップ
@@ -28,7 +29,7 @@ $ docker compose stop
 # 更新
 docker compose up --build -d
 
-# 前のコンテナを削除してから更新
+# 以前のコンテナを削除してから更新
 docker compose down
 docker compose up -d
 ```
@@ -37,6 +38,9 @@ docker compose up -d
 - OpenAIのAPIキー
   - `/.env.sample`をコピーして`/.env`とし，APIキーを追加
   - 参照する際は環境変数`OPENAI_API_KEY`を指定
+- JupyterLab
+  - ホストマシンの8888ポートにアクセスすべし
+  - トークンは`stnet`
 - ベクトルDB
   - Qdrant(クワッドラント)をコンテナで立ち上げている
     - ホスト名：qdrant
