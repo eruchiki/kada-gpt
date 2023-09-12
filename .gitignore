@@ -3,3 +3,5 @@
 !/jupyterlab/settings/.gitkeep
 .ipynb_checkpoints/
 ./env
+./workspace/pdf_data
+./workspace/pdf_to_text
