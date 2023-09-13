@@ -31,4 +31,8 @@ RUN pip install --no-cache-dir \
     beautifulsoup4 \
     Pillow \
     opencv-python \
-    llama-index
+    llama-index \
+    nltk \
+    pypdf \
+    pdfminer.six \
+    chromadb

@@ -2,3 +2,4 @@
 /jupyterlab/settings/*
 !/jupyterlab/settings/.gitkeep
 .ipynb_checkpoints/
+.pdf
