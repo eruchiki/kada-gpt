@@ -2,6 +2,9 @@
 /jupyterlab/settings/*
 !/jupyterlab/settings/.gitkeep
 .ipynb_checkpoints/
-./env
+.Trash-0/
+/.env
 pdf_data/
 pdf_to_text/
+storage/
+storage_context/
