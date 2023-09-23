@@ -17,3 +17,5 @@ beautifulsoup4
 openai
 llama-index
 qdrant-client
+streamlit
+pdfminer.six
