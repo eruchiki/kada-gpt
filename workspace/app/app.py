@@ -37,14 +37,20 @@ def select_model():
     st.session_state.max_token = OpenAI.modelname_to_contextsize(st.session_state.model_name) - 300
     return ChatOpenAI(temperature=0, model_name=st.session_state.model_name)
 
+def setting_page():
+    st.session_state.sentence_length = st.number_input('1vectorにおける文章数',1,10,1,step=1)
+    st.session_state.split_string = st.text_input("split_word ", key="input",value="。")
 
 def get_pdf_text():
     uploaded_file = st.file_uploader(
         label='PDFをアップロードしてください．',
         type='pdf'
     )
+    setting_page()
     if uploaded_file:
         file_path = f"./reference_data/{uploaded_file.name}"
+        if file_path in glob("./reference_data/*.pdf"):
+            return -1
         with open(file_path,mode="wb") as f:
             f.write(uploaded_file.read())
         text = pdf_reader(file_path)
@@ -64,7 +70,9 @@ def page_pdf_upload_and_build_vector_db():
     container = st.container()
     with container:
         pdf_text = get_pdf_text()
-        if pdf_text:
+        if pdf_text == -1:
+            st.warning('その文献は既にベクトル化されています')
+        elif pdf_text:
             with st.spinner("Loading PDF ..."):
                 cost = insert_data(pdf_text,
                             embeddings = OpenAIEmbeddings(),
@@ -100,7 +108,7 @@ def page_ask_my_pdf():
 
 def main():
     init_page() 
-    selection = st.sidebar.radio("モード", ["PDFをアップロード", "組織内文書へ質問"])
+    selection = st.sidebar.radio("モード", ["PDFをアップロード","組織内文書へ質問"])
     if selection == "PDFをアップロード":
         page_pdf_upload_and_build_vector_db()
     elif selection == "組織内文書へ質問":
