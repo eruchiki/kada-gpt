@@ -3,6 +3,8 @@ import re
 import os
 from glob import glob
 from unicodedata import normalize
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
 
 def pdf_reader(file_path,skip_page=[],table_save=True,page_save=True):
     doc = fitz.open(file_path)
@@ -62,12 +64,16 @@ def split_text(text_data,pattern):
             result.append(text)
     return "".join(result)
 
-def sentence_split(text_data,split_str="。"):
-    text_list = text_data.split("\n")
-    result = []
-    for text in text_list:
-        if text[-1]==split_str:
-            result.append(text+"\n")
-        else:
-            result.append(text)
-    return "".join(result)
+def chunk_split(text_data,chunk_num=1024,split_str="。"):
+    text_data = text_data.replace("\n","").replace(split_str,"\n")
+    text_splitter = RecursiveCharacterTextSplitter(
+    separators = "\n",
+    chunk_size = chunk_num,
+    chunk_overlap = 0
+    )
+    return text_splitter.split_text(text_data)
+
+
+def sentence_split(text_data,split_str="。",sentence_num = 1):
+    text_data = text_data.replace("\n","").replace(split_str,"\n")
+    return [split_str.join(text_data[t:t+2]) for t in range(0,len(text_data)-2,sentence_num)]

@@ -11,7 +11,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 
 HOST = "qdrant"
 PORT = 6333
-COLLECTION_NAME = "document"
+COLLECTION_NAME = "document3"
 memory = ConversationBufferWindowMemory(memory_key="chat_history",k=3)
 
 def init_page():
@@ -38,8 +38,14 @@ def select_model():
     return ChatOpenAI(temperature=0, model_name=st.session_state.model_name)
 
 def setting_page():
-    st.session_state.sentence_length = st.number_input('1vectorにおける文章数',1,10,1,step=1)
-    st.session_state.split_string = st.text_input("split_word ", key="input",value="。")
+    split_option = st.radio("文書分割方法", ("chunk", "sentence"),horizontal=True)
+    st.session_state.split_option = split_option
+    if split_option == "sentence":
+        st.session_state.sentence_length = st.number_input('1vectorにおける文章数',1,10,1,step=1)
+        st.session_state.split_string = st.text_input("split_word ", key="input",value="。")
+    elif split_option == "chunk":
+        st.session_state.chunk_num = st.number_input('1vectorにおけるchunk数',100,2000,100,step=100)
+        st.session_state.split_string = st.text_input("split_word ", key="input",value="。")
 
 def get_pdf_text():
     uploaded_file = st.file_uploader(
@@ -55,12 +61,16 @@ def get_pdf_text():
             f.write(uploaded_file.read())
         text = pdf_reader(file_path)
         clean_text = normalize_text(text,remove_str="[\u3000 ]")
-        split_text = sentence_split(skip_text(clean_text,skip_pattern=r"^\d+"))
+        skiped_text = skip_text(clean_text,skip_pattern=r"^\d+")
         with open("./process_data/"+str(os.path.splitext(os.path.basename(file_path))[0])+".txt",mode="w",encoding="utf-8") as f:
-            f.write(split_text)
-        st.write(split_text)
-        documents = text_to_documents(split_text.split("\n"),
+            f.write(skiped_text)
+        if st.session_state.split_option == "sentence":
+            split_text = sentence_split(skiped_text,split_str=st.session_state.split_string).split("\n")
+        elif st.session_state.split_option == "chunk":
+            split_text = chunk_split(skiped_text,chunk_num=st.session_state.chunk_num,split_str=st.session_state.split_string)    
+        documents = text_to_documents(split_text,
                                       metadata={"type":"related","filename":uploaded_file.name})
+        st.write("".join(split_text))
         return documents
     else:
         return None
@@ -89,22 +99,25 @@ def page_ask_my_pdf():
     response_container = st.container()
 
     with container:
-        query = st.text_input("質問: ", key="input")
-        if not query:
+        with st.form("question_form", clear_on_submit=False):
             answer = None
-        else:
+            st.session_state.ralate_num = st.number_input('1queryに置ける参考情報数',1,10,1,step=1)
+            query = st.text_input("質問: ", key="input")
+            submitted = st.form_submit_button("質問する")
+        if submitted:
             with st.spinner("ChatGPTが入力中 ..."):
-                answer, relate_data,cost = chat(query,llm,memory,db)
+                answer, relate_data,cost = chat(query,llm,memory,db,st.session_state.ralate_num)
             st.session_state.costs.append(cost)
 
         if answer:
             with response_container:
+                st.markdown("## 質問")
+                st.write(query)
                 st.markdown("## 回答")
                 st.write(answer)
                 st.markdown("## 参照情報")
                 for relate in relate_data:
                     st.write(relate)
-
 
 def main():
     init_page() 

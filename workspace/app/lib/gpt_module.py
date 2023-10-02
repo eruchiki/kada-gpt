@@ -4,6 +4,7 @@ from lib.vector_module import documents_search
 from langchain.callbacks import get_openai_callback
 import os
 import json
+import tiktoken
 
 def create_template(relate_info):
     input_val = ["chat_history","query"]
@@ -29,9 +30,10 @@ def save_log(query,response,related_data,score_data):
     with open(log_file, mode='w',encoding="utf-8") as f:
         json.dump(log_data, f,ensure_ascii=False)
     
-def chat(query,llm,memory,db):
-    related_data,score_data = documents_search(db,query,top_k=10)
-    if related_data == []:
+def chat(query,llm,memory,db,relate_num=3,filter=None):
+    enc = tiktoken.get_encoding("gpt2")
+    related_data,score_data = documents_search(db,query,top_k=relate_num,filter=filter)
+    if related_data == [] or len(enc.encode("".join(related_data))) > 4000:
         response = "すみません。答えられません。"
         return response,related_data,0
     template = create_template(related_data)
