@@ -76,4 +76,4 @@ def chunk_split(text_data,chunk_num=1024,split_str="。"):
 
 def sentence_split(text_data,split_str="。",sentence_num = 1):
     text_data = text_data.replace("\n","").replace(split_str,"\n")
-    return [split_str.join(text_data[t:t+2]) for t in range(0,len(text_data)-2,sentence_num)]
+    return [split_str.join(text_data[t:t+sentence_num]) for t in range(0,len(text_data)-sentence_num+1,sentence_num)]
