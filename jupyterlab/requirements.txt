@@ -18,3 +18,4 @@ openai
 llama-index
 qdrant-client
 google-api-python-client
+google-search-results
