@@ -11,7 +11,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 
 HOST = "qdrant"
 PORT = 6333
-COLLECTION_NAME = "document3"
+COLLECTION_NAME = "document4"
 memory = ConversationBufferWindowMemory(memory_key="chat_history",k=3)
 
 def init_page():
@@ -42,10 +42,10 @@ def setting_page():
     st.session_state.split_option = split_option
     if split_option == "sentence":
         st.session_state.sentence_length = st.number_input('1vectorにおける文章数',1,10,1,step=1)
-        st.session_state.split_string = st.text_input("split_word ", key="input",value="。")
+        st.session_state.split_string = st.text_input("split_word ", key="input",value="。.．")
     elif split_option == "chunk":
-        st.session_state.chunk_num = st.number_input('1vectorにおけるchunk数',100,2000,100,step=100)
-        st.session_state.split_string = st.text_input("split_word ", key="input",value="。")
+        st.session_state.chunk_num = st.number_input('1vectorにおけるchunk数',100,2000,1000,step=100)
+        st.session_state.split_string = st.text_input("split_word ", key="input",value="。.．")
 
 def get_pdf_text():
     uploaded_file = st.file_uploader(
@@ -54,6 +54,12 @@ def get_pdf_text():
     )
     setting_page()
     if uploaded_file:
+        if not os.path.exists("./reference_data"):
+            os.mkdir("./reference_data")
+        if not os.path.exists("./data"):
+            os.mkdir("./data")
+        if not os.path.exists("./process_data"):
+            os.mkdir("./process_data")
         file_path = f"./reference_data/{uploaded_file.name}"
         if file_path in glob("./reference_data/*.pdf"):
             return -1

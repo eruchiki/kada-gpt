@@ -19,3 +19,5 @@ llama-index
 openai
 nltk
 qdrant-client
+streamlit
+pymupdf

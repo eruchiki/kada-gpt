@@ -64,16 +64,20 @@ def split_text(text_data,pattern):
             result.append(text)
     return "".join(result)
 
-def chunk_split(text_data,chunk_num=1024,split_str="。"):
-    text_data = text_data.replace("\n","").replace(split_str,"\n")
+def chunk_split(text_data,chunk_num=1024,split_str="。.．"):
+    split_word = "["+split_str+"]"
+    text_data = text_data.replace("\n","")
+    text_data = re.sub(split_word , '\n', text_data)
     text_splitter = RecursiveCharacterTextSplitter(
-    separators = "\n",
+    separators = ["\n",""],
     chunk_size = chunk_num,
     chunk_overlap = 0
     )
     return text_splitter.split_text(text_data)
 
 
-def sentence_split(text_data,split_str="。",sentence_num = 1):
-    text_data = text_data.replace("\n","").replace(split_str,"\n")
+def sentence_split(text_data,split_str="。.．",sentence_num = 1):
+    split_word = "["+split_str+"]"
+    text_data = text_data.replace("\n","")
+    text_data = re.sub(split_word , '\n', text_data)
     return [split_str.join(text_data[t:t+sentence_num]) for t in range(0,len(text_data)-sentence_num+1,sentence_num)]
