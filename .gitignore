@@ -4,7 +4,12 @@
 .ipynb_checkpoints/
 .Trash-0/
 /.env
+__pycache__/
 pdf_data/
 pdf_to_text/
+data/
+process_data/
+reference_data/
 storage/
 storage_context/
+log.json
