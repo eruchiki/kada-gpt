@@ -11,7 +11,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 
 HOST = "qdrant"
 PORT = 6333
-COLLECTION_NAME = "document4"
+COLLECTION_NAME = "question_test9"
 memory = ConversationBufferWindowMemory(memory_key="chat_history",k=3)
 
 def init_page():
@@ -71,12 +71,12 @@ def get_pdf_text():
         with open("./process_data/"+str(os.path.splitext(os.path.basename(file_path))[0])+".txt",mode="w",encoding="utf-8") as f:
             f.write(skiped_text)
         if st.session_state.split_option == "sentence":
-            split_text = sentence_split(skiped_text,split_str=st.session_state.split_string).split("\n")
+            split_text = sentence_split(skiped_text,split_str=st.session_state.split_string,sentence_num=st.session_state.sentence_length)
         elif st.session_state.split_option == "chunk":
             split_text = chunk_split(skiped_text,chunk_num=st.session_state.chunk_num,split_str=st.session_state.split_string)    
         documents = text_to_documents(split_text,
                                       metadata={"type":"related","filename":uploaded_file.name})
-        st.write("".join(split_text))
+        # st.write("\n".join(split_text))
         return documents
     else:
         return None
@@ -122,8 +122,8 @@ def page_ask_my_pdf():
                 st.markdown("## 回答")
                 st.write(answer)
                 st.markdown("## 参照情報")
-                for relate in relate_data:
-                    st.write(relate)
+                for r,relate in enumerate(relate_data,start=1):
+                    st.markdown(f"{r}. {relate}")
 
 def main():
     init_page() 

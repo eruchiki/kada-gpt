@@ -9,13 +9,14 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 def pdf_reader(file_path,skip_page=[],table_save=True,page_save=True):
     doc = fitz.open(file_path)
     filename = os.path.splitext(os.path.basename(file_path))[0]
-    output_dir = f"./data/{filename}"
-    if not os.path.exists(output_dir):
-        try:
-            os.mkdir(output_dir)
-        except OSError:
-            dir_len = len(glob("./data/*")) + 1 
-            os.mkdir(f"./data/{dir_len}")
+    if page_save or table_save:
+        output_dir = f"./data/{filename}"
+        if not os.path.exists(output_dir):
+            try:
+                os.mkdir(output_dir)
+            except OSError:
+                dir_len = len(glob("./data/*")) + 1 
+                os.mkdir(f"./data/{dir_len}")
     text_data = ""
     for page in range(len(doc)):
         page_data = doc[page]
@@ -80,4 +81,11 @@ def sentence_split(text_data,split_str="。.．",sentence_num = 1):
     split_word = "["+split_str+"]"
     text_data = text_data.replace("\n","")
     text_data = re.sub(split_word , '\n', text_data)
-    return [split_str.join(text_data[t:t+sentence_num]) for t in range(0,len(text_data)-sentence_num+1,sentence_num)]
+    text_data = text_data.split("\n")
+    return ["\n".join(text_data[t:t+sentence_num]) for t in range(0,len(text_data)-sentence_num+1,sentence_num)]
+
+if __name__=="__main__":
+    file_path = "test_pdf/20230721_mitsuda_ipsj_seminar2023.pdf"
+    text_data = pdf_reader(file_path,table_save=False,page_save=False)
+    with open("test.txt",mode="w",encoding="utf-8") as f:
+        f.write(text_data)
