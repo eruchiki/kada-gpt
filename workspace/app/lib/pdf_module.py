@@ -44,15 +44,7 @@ def normalize_text(text_data,remove_str="\u3000"):
     return clean_text
 
 def skip_text(text_data,skip_pattern):
-    text_list = text_data.split("\n")
-    result = []
-    for text in text_list:
-        text = text.replace("\n","")
-        if text == "" or re.fullmatch(skip_pattern,text):
-            continue
-        else:
-            result.append(text)
-    return "\n".join(result)
+    return re.sub('\n', '', text_data)
 
 def split_text(text_data,pattern):
     text_list = text_data.split("\n")
@@ -65,11 +57,8 @@ def split_text(text_data,pattern):
     return "".join(result)
 
 def chunk_split(text_data,chunk_num=1024,split_str="。.．"):
-    split_word = "["+split_str+"]"
-    text_data = text_data.replace("\n","")
-    text_data = re.sub(split_word , '\n', text_data)
     text_splitter = RecursiveCharacterTextSplitter(
-    separators = ["\n",""],
+    separators = ["\n\n","\n","。",".","．","，",",","、",""],
     chunk_size = chunk_num,
     chunk_overlap = 0
     )

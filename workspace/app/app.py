@@ -7,6 +7,7 @@ from lib.store_module import *
 from lib.gpt_module import *
 from langchain.memory import ConversationBufferWindowMemory,VectorStoreRetrieverMemory
 from langchain.embeddings.openai import OpenAIEmbeddings
+from lib.const import *
 
 
 HOST = "qdrant"
@@ -23,19 +24,28 @@ def init_page():
     if 'costs' not in st.session_state:
         st.session_state.costs = []
 
-
 def select_model():
-    model = st.sidebar.radio("モデルを選んでください:", ("GPT-3.5", "GPT-3.5-16k", "GPT-4"))
-    if model == "GPT-3.5":
-        st.session_state.model_name = "gpt-3.5-turbo"
-    elif model == "GPT-3.5":
-        st.session_state.model_name = "gpt-3.5-turbo-16k"
+    if StSession.MODEL_RADIO not in st.session_state:
+        st.session_state[StSession.MODEL_RADIO] = list(StSession.MODEL_OPTIONS.keys())[0]
+        index = 0
+    elif StSession.MODEL_RADIO_TMP not in st.session_state:
+            # st.session_state[StSession.MODEL_RADIO_TMP] = st.session_state[StSession.MODEL_RADIO]
+        index = list(StSession.MODEL_OPTIONS.keys()).index(st.session_state[StSession.MODEL_RADIO])
     else:
-        st.session_state.model_name = "gpt-4"
+        index = list(StSession.MODEL_OPTIONS.keys()).index(st.session_state[StSession.MODEL_RADIO_TMP])
+    model_help = "モデル毎の最大トークン数は以下の通りです．"
+    for key, value in StSession.MODEL_OPTIONS.items():
+        model_help += f"\n\n{key} : {OpenAI.modelname_to_contextsize(value)}"
+    st.session_state[StSession.MODEL_RADIO] = st.sidebar.selectbox("モデルを選んでください:",
+                     options=list(StSession.MODEL_OPTIONS.keys()),
+                     help=model_help,
+                     key=StSession.MODEL_RADIO_TMP,
+                     index=index)
+    st.session_state[StSession.MODEL_NAME] = StSession.MODEL_OPTIONS[st.session_state[StSession.MODEL_RADIO]]
     
     # 300: 本文以外の指示のトークン数 (以下同じ)
-    st.session_state.max_token = OpenAI.modelname_to_contextsize(st.session_state.model_name) - 300
-    return ChatOpenAI(temperature=0, model_name=st.session_state.model_name)
+    st.session_state[StSession.MAX_TOKEN] = OpenAI.modelname_to_contextsize(st.session_state[StSession.MODEL_NAME]) - 300
+    return ChatOpenAI(temperature=0, model_name=st.session_state[StSession.MODEL_NAME])
 
 def setting_page():
     split_option = st.radio("文書分割方法", ("chunk", "sentence"),horizontal=True)
@@ -67,15 +77,17 @@ def get_pdf_text():
             f.write(uploaded_file.read())
         text = pdf_reader(file_path)
         clean_text = normalize_text(text,remove_str="[\u3000 ]")
-        skiped_text = skip_text(clean_text,skip_pattern=r"^\d+")
+        skipped_text = skip_text(clean_text,skip_pattern=r"^\d+")
+        st.write([skipped_text])
         with open("./process_data/"+str(os.path.splitext(os.path.basename(file_path))[0])+".txt",mode="w",encoding="utf-8") as f:
-            f.write(skiped_text)
+            f.write(skipped_text)
         if st.session_state.split_option == "sentence":
-            split_text = sentence_split(skiped_text,split_str=st.session_state.split_string).split("\n")
+            split_text = sentence_split(skipped_text,split_str=st.session_state.split_string).split("\n")
         elif st.session_state.split_option == "chunk":
-            split_text = chunk_split(skiped_text,chunk_num=st.session_state.chunk_num,split_str=st.session_state.split_string)    
+            split_text = chunk_split(skipped_text,chunk_num=st.session_state.chunk_num,split_str=st.session_state.split_string)    
         documents = text_to_documents(split_text,
                                       metadata={"type":"related","filename":uploaded_file.name})
+        st.write(documents)
         st.write("".join(split_text))
         return documents
     else:
@@ -107,23 +119,35 @@ def page_ask_my_pdf():
     with container:
         with st.form("question_form", clear_on_submit=False):
             answer = None
-            st.session_state.ralate_num = st.number_input('1queryに置ける参考情報数',1,10,1,step=1)
+            st.number_input('1queryに置ける参考情報数',1,10,1,step=1,key="relate_num")
             query = st.text_input("質問: ", key="input")
             submitted = st.form_submit_button("質問する")
         if submitted:
+            st.session_state[StSession.CHAT_QUERY] = query
             with st.spinner("ChatGPTが入力中 ..."):
-                answer, relate_data,cost = chat(query,llm,memory,db,st.session_state.ralate_num)
+                answer, relate_data,cost,llm_chain,nums_ref = chat(st.session_state[StSession.CHAT_QUERY],llm,memory,db,st.session_state.relate_num, max_token=st.session_state[StSession.MAX_TOKEN])
             st.session_state.costs.append(cost)
+            st.session_state[StSession.CHAT_ANSWER] = answer
+            st.session_state[StSession.CHAT_RELATE] = relate_data
+            st.session_state[StSession.CHAT_REFERENCE_NUMS] = nums_ref
 
-        if answer:
+        if StSession.CHAT_ANSWER in st.session_state:
             with response_container:
                 st.markdown("## 質問")
-                st.write(query)
+                st.write(st.session_state[StSession.CHAT_QUERY])
                 st.markdown("## 回答")
-                st.write(answer)
+                st.write(st.session_state[StSession.CHAT_ANSWER])
+                st.markdown("## 参考文献")
+                for i, relate in enumerate(st.session_state[StSession.CHAT_RELATE]):
+                    if i in st.session_state[StSession.CHAT_REFERENCE_NUMS]:
+                        string = f"[{i}] {relate.metadata['filename']}"
+                        with open(f"./reference_data/{relate.metadata['filename']}", 'rb') as f:
+                            data = f.read()
+                        st.download_button(label=string, data=data, file_name=relate.metadata['filename'])
+                        # st.write(string)
                 st.markdown("## 参照情報")
-                for relate in relate_data:
-                    st.write(relate)
+                for relate in st.session_state[StSession.CHAT_RELATE]:
+                    st.write(relate.page_content)
 
 def main():
     init_page() 
