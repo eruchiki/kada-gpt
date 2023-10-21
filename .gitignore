@@ -13,3 +13,6 @@ reference_data/
 storage/
 storage_context/
 log.json
+text_pdf/
+text.txt
+category/

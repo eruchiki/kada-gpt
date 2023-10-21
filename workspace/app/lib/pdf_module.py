@@ -66,11 +66,12 @@ def split_text(text_data,pattern):
     return "".join(result)
 
 def chunk_split(text_data,chunk_num=1024,split_str="。.．"):
-    split_word = "["+split_str+"]"
+    # split_word = "["+split_str+"]"
+    split_word = [sp for sp in split_str]+[""]
     text_data = text_data.replace("\n","")
-    text_data = re.sub(split_word , '\n', text_data)
+    # text_data = re.sub(split_word , '\n', text_data)
     text_splitter = RecursiveCharacterTextSplitter(
-    separators = ["\n",""],
+    separators = split_word,
     chunk_size = chunk_num,
     chunk_overlap = 0
     )
