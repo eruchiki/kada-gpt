@@ -124,17 +124,17 @@ def page_ask_my_pdf():
         if submitted:
             st.session_state[StSession.CHAT_QUERY] = query
             with st.spinner("ChatGPTが入力中 ..."):
-                answer, relate_data,cost,llm_chain,nums_ref,input_token_size = chat(st.session_state[StSession.CHAT_QUERY],llm,memory,db,st.session_state.relate_num, max_token=st.session_state[StSession.MAX_TOKEN])
+                answer, file_list, cost,nums_ref = chat(st.session_state[StSession.CHAT_QUERY],llm,memory,db,st.session_state.relate_num, max_token=st.session_state[StSession.MAX_TOKEN])
             st.session_state.costs.append(cost)
             st.session_state[StSession.CHAT_ANSWER] = answer
-            st.session_state[StSession.CHAT_RELATE] = relate_data
+            st.session_state[StSession.CHAT_RELATE] = file_list
             st.session_state[StSession.CHAT_REFERENCE_NUMS] = nums_ref
-            st.session_state[StSession.CHAT_INPUT_TOKEN] = input_token_size
+            # st.session_state[StSession.CHAT_INPUT_TOKEN] = input_token_size
 
         if StSession.CHAT_ANSWER in st.session_state:
             with response_container:
-                st.sidebar.markdown("## 直近の質問のトークン数")
-                st.sidebar.write(st.session_state[StSession.CHAT_INPUT_TOKEN])
+                # st.sidebar.markdown("## 直近の質問のトークン数")
+                # st.sidebar.write(st.session_state[StSession.CHAT_INPUT_TOKEN])
                 st.markdown("## 質問")
                 st.write(st.session_state[StSession.CHAT_QUERY])
                 st.markdown("## 回答")
@@ -142,15 +142,14 @@ def page_ask_my_pdf():
                 st.markdown("## 参考文献")
                 for i, relate in enumerate(st.session_state[StSession.CHAT_RELATE]):
                     if i in st.session_state[StSession.CHAT_REFERENCE_NUMS]:
-                        string = f"[{i}] {relate.metadata['filename']}"
-                        with open(f"./reference_data/{relate.metadata['filename']}", 'rb') as f:
+                        string = f"[{i}] {relate}"
+                        with open(f"./reference_data/{relate}", 'rb') as f:
                             data = f.read()
-                        st.download_button(label=string, data=data, file_name=relate.metadata['filename'])
-                        # st.write(string)
-                st.markdown("## 参照情報")
-                for relate in st.session_state[StSession.CHAT_RELATE]:
-                    st.write(relate.page_content)
-                    st.write(relate.metadata)
+                        st.download_button(label=string, data=data, file_name=relate)
+                # st.markdown("## 参照情報")
+                # for relate in st.session_state[StSession.CHAT_RELATE]:
+                #     st.write(relate.page_content)
+                #     st.write(relate.metadata)
 
 def main():
     init_page() 
