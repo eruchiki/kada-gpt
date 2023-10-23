@@ -18,3 +18,4 @@ class StSession(metaclass=ConstMeta):
     CHAT_ANSWER = "chat_answer"
     CHAT_RELATE = "chat_relate"
     CHAT_REFERENCE_NUMS = "chat_reference_nums"
+    CHAT_INPUT_TOKEN = "chat_input_token"

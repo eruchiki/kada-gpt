@@ -18,7 +18,7 @@ memory = ConversationBufferWindowMemory(memory_key="chat_history",k=3)
 def init_page():
     st.set_page_config(
         page_title="組織内文書へ質問",
-        page_icon="🤗"
+        page_icon="🧠"
     )
     st.sidebar.title("メニュー")
     if 'costs' not in st.session_state:
@@ -29,22 +29,21 @@ def select_model():
         st.session_state[StSession.MODEL_RADIO] = list(StSession.MODEL_OPTIONS.keys())[0]
         index = 0
     elif StSession.MODEL_RADIO_TMP not in st.session_state:
-            # st.session_state[StSession.MODEL_RADIO_TMP] = st.session_state[StSession.MODEL_RADIO]
         index = list(StSession.MODEL_OPTIONS.keys()).index(st.session_state[StSession.MODEL_RADIO])
     else:
         index = list(StSession.MODEL_OPTIONS.keys()).index(st.session_state[StSession.MODEL_RADIO_TMP])
+    
     model_help = "モデル毎の最大トークン数は以下の通りです．"
     for key, value in StSession.MODEL_OPTIONS.items():
         model_help += f"\n\n{key} : {OpenAI.modelname_to_contextsize(value)}"
+    
     st.session_state[StSession.MODEL_RADIO] = st.sidebar.selectbox("モデルを選んでください:",
                      options=list(StSession.MODEL_OPTIONS.keys()),
                      help=model_help,
                      key=StSession.MODEL_RADIO_TMP,
                      index=index)
     st.session_state[StSession.MODEL_NAME] = StSession.MODEL_OPTIONS[st.session_state[StSession.MODEL_RADIO]]
-    
-    # 300: 本文以外の指示のトークン数 (以下同じ)
-    st.session_state[StSession.MAX_TOKEN] = OpenAI.modelname_to_contextsize(st.session_state[StSession.MODEL_NAME]) - 300
+    st.session_state[StSession.MAX_TOKEN] = OpenAI.modelname_to_contextsize(st.session_state[StSession.MODEL_NAME])
     return ChatOpenAI(temperature=0, model_name=st.session_state[StSession.MODEL_NAME])
 
 def setting_page():
@@ -84,7 +83,7 @@ def get_pdf_text():
         if st.session_state.split_option == "sentence":
             split_text = sentence_split(skipped_text,split_str=st.session_state.split_string).split("\n")
         elif st.session_state.split_option == "chunk":
-            split_text = chunk_split(skipped_text,chunk_num=st.session_state.chunk_num,split_str=st.session_state.split_string)    
+            split_text = chunk_split(skipped_text,chunk_num=st.session_state.chunk_num)    
         documents = text_to_documents(split_text,
                                       metadata={"type":"related","filename":uploaded_file.name})
         st.write(documents)
@@ -120,19 +119,22 @@ def page_ask_my_pdf():
         with st.form("question_form", clear_on_submit=False):
             answer = None
             st.number_input('1queryに置ける参考情報数',1,10,1,step=1,key="relate_num")
-            query = st.text_input("質問: ", key="input")
+            query = st.text_area("質問: ", key="input")
             submitted = st.form_submit_button("質問する")
         if submitted:
             st.session_state[StSession.CHAT_QUERY] = query
             with st.spinner("ChatGPTが入力中 ..."):
-                answer, relate_data,cost,llm_chain,nums_ref = chat(st.session_state[StSession.CHAT_QUERY],llm,memory,db,st.session_state.relate_num, max_token=st.session_state[StSession.MAX_TOKEN])
+                answer, relate_data,cost,llm_chain,nums_ref,input_token_size = chat(st.session_state[StSession.CHAT_QUERY],llm,memory,db,st.session_state.relate_num, max_token=st.session_state[StSession.MAX_TOKEN])
             st.session_state.costs.append(cost)
             st.session_state[StSession.CHAT_ANSWER] = answer
             st.session_state[StSession.CHAT_RELATE] = relate_data
             st.session_state[StSession.CHAT_REFERENCE_NUMS] = nums_ref
+            st.session_state[StSession.CHAT_INPUT_TOKEN] = input_token_size
 
         if StSession.CHAT_ANSWER in st.session_state:
             with response_container:
+                st.sidebar.markdown("## 直近の質問のトークン数")
+                st.sidebar.write(st.session_state[StSession.CHAT_INPUT_TOKEN])
                 st.markdown("## 質問")
                 st.write(st.session_state[StSession.CHAT_QUERY])
                 st.markdown("## 回答")
@@ -148,6 +150,7 @@ def page_ask_my_pdf():
                 st.markdown("## 参照情報")
                 for relate in st.session_state[StSession.CHAT_RELATE]:
                     st.write(relate.page_content)
+                    st.write(relate.metadata)
 
 def main():
     init_page() 

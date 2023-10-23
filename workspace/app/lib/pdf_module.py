@@ -58,9 +58,10 @@ def split_text(text_data,pattern):
 
 def chunk_split(text_data,chunk_num=1024,split_str="。.．"):
     text_splitter = RecursiveCharacterTextSplitter(
-    separators = ["\n\n","\n","。",".","．","，",",","、",""],
-    chunk_size = chunk_num,
-    chunk_overlap = 0
+        separators = ["\n\n","\n","。","．",".","、","，",","],
+        keep_separator = True,
+        chunk_size = chunk_num,
+        chunk_overlap = 0
     )
     return text_splitter.split_text(text_data)
 
