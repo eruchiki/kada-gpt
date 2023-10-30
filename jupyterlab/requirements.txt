@@ -16,6 +16,10 @@ requests
 beautifulsoup4 
 openai
 llama-index
+openai
+nltk
 qdrant-client
+streamlit
+pymupdf
 google-api-python-client
 google-search-results
