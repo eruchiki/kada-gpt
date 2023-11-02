@@ -15,7 +15,9 @@ class StSession(metaclass=ConstMeta):
                     "GPT-4-32k": "gpt-4-32k"}
     MAX_TOKEN = "max_token"
     CHAT_QUERY = "chat_query"
+    CHAT_QUERY_TMP = "chat_query_tmp"
     CHAT_ANSWER = "chat_answer"
     CHAT_RELATE = "chat_relate"
     CHAT_REFERENCE_NUMS = "chat_reference_nums"
+    CHAT_REFERENCE_NUMS_TMP = "chat_reference_nums_tmp"
     CHAT_INPUT_TOKEN = "chat_input_token"

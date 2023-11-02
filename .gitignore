@@ -13,3 +13,4 @@ reference_data/
 storage/
 storage_context/
 log.json
+logs/

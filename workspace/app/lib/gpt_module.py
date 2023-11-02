@@ -11,12 +11,20 @@ from langchain.schema import Document
 from langchain import LLMChain
 from lib.vector_module import documents_search
 from langchain.callbacks import get_openai_callback
-import os
-import json
 import tiktoken
 from lib.const import *
+from lib.log_module import save_chat_log
 import re
 import asyncio
+import time
+
+# トークン数をカウント
+# モデルにはgpt-3.5-turboやtext-embedding-ada-002がある
+# なお，gpt-3.5-turboとgpt-4のエンコーディングは同じなので結果は変わらない
+def num_tokens_from_string(string, model_name="gpt-3.5-turbo"):
+    encoding = tiktoken.encoding_for_model(model_name)
+    num_tokens = len(encoding.encode(string))
+    return num_tokens
 
 # compose(最終的な出力回答)部分のプロンプトテンプレートを作成
 # 引数：ドキュメントのリスト(要素として，ドキュメント情報とメタデータを含む)
@@ -48,6 +56,7 @@ def create_prompt_info_for_compose(info_list):
     selected_info_list = [info for info in info_list if info != []]
     selected_info_list = sorted(selected_info_list, key=lambda x:x[0][0].metadata["filename"])
 
+    for_log_quote_lines = []
     file_list = []
     system_template_info = ""
     current_file = ""
@@ -63,9 +72,10 @@ def create_prompt_info_for_compose(info_list):
         for info_set in info_group:
             for info in info_set:
                 system_template_info += f"  - [{file_num}-{item_num}] {info.page_content}\n"
+                for_log_quote_lines.append([f"{file_num}-{item_num}", info.page_content])
                 item_num += 1
             system_template_info += "\n"
-    return system_template_info, file_list
+    return system_template_info, file_list, for_log_quote_lines
 
 def chunk_split(text_data,chunk_num=6):
     text_splitter = RecursiveCharacterTextSplitter(
@@ -142,17 +152,7 @@ def save_memory(memory,query,response):
     memory.chat_memory.add_user_message(query)
     memory.chat_memory.add_ai_message(response)
 
-def save_log(query,response,related_data,score_data):
-    log_file = "./log.json"
-    new_data = {"query":query,"response":response,"relate":related_data,"score":score_data}
-    if os.path.exists(log_file):
-        with open(log_file,mode="r",encoding="utf-8") as f:
-            log_data = json.load(f)
-    else:
-        log_data = []
-    log_data.append(new_data)
-    with open(log_file, mode='w',encoding="utf-8") as f:
-        json.dump(log_data, f,ensure_ascii=False)
+
 
 # selectionのプロンプトでGPT3.5に問い合わせ
 async def get_answer(llm_chain, _filename, _info, _query):
@@ -211,7 +211,7 @@ def selection_extraction(info_list, response_list):
         if len(info_group) > 0:
             dst_info.append(info_group)
         selected_info_list.append(dst_info)
-    return selected_info_list
+    return selected_info_list, number_list
 
 # select処理を行う
 # Qdrantから取ってきた文書に対し，情報の取捨選択をGPTに行わせる
@@ -220,21 +220,32 @@ def select(related_data, query):
     string_info_list = []
     info_list = []
     filename_list = []
+
+    select_data_format = []
+
     for data in related_data:
         string_info, filename, info = create_prompt_info_for_select(data)
+        select_data_format.append(prompt.format(query=query,info=string_info,filename=filename))
         string_info_list.append(string_info)
         info_list.append(info)
         filename_list.append(filename)
     tmp_list =  asyncio.run(generate_concurrently(string_info_list, filename_list, query, prompt))
-    total_cost = sum([cost for resp, cost in tmp_list])
+    each_cost = [cost for resp, cost in tmp_list]
+    total_cost = sum(each_cost)
     response = [resp for resp, cost in tmp_list]
-    selected_info_list = selection_extraction(info_list, response)
-    return selected_info_list, response, total_cost
+    selected_info_list, number_list = selection_extraction(info_list, response)
+
+    for_log_select_data = []
+    for prompt_str, response, cost, res_format, select_lines in zip(select_data_format, response, each_cost, number_list, selected_info_list):
+        for_log_select_data.append([prompt_str, response, cost, res_format, select_lines])
+
+    return selected_info_list, total_cost, for_log_select_data
 
 def compose(selected_info_list, query, llm, max_token):
     prompt = create_prompt_template_for_compose()
-    string_info, file_list = create_prompt_info_for_compose(selected_info_list)
-    input_token_size = llm.get_num_tokens(prompt.format(query=query, info=string_info))
+    string_info, file_list, for_log_quote_lines = create_prompt_info_for_compose(selected_info_list)
+    prompt_str = prompt.format(query=query, info=string_info)
+    input_token_size = num_tokens_from_string(prompt_str)
     if input_token_size > max_token:
         response = "トークンサイズが制限を超えています"
         return response,file_list,0,0
@@ -246,25 +257,36 @@ def compose(selected_info_list, query, llm, max_token):
     with get_openai_callback() as cb:
         response = llm_chain.run({"query":query,"info":string_info})
     cost = cb.total_cost
-    # save_memory(memory,query,response)
-    # save_log(query,response,[data.page_content for data in related_data],score_data)
-    ret = re.findall(r"\[([0-9]+)", response)
+    ret = re.findall(r"\[([0-9]+)\-[0-9]+\]", response)
+    ret_lines = re.findall(r"\[([0-9]+\-[0-9]+)\]", response)
     nums_ref = sorted(list(set(map(int, ret))))
-    print(response)
-    return response,file_list,cost,nums_ref
 
-def chat(query,llm,memory,db,relate_num=3,filter=None, max_token=4000):
+    res_quote_lines = [{"number":i,"sentence":line} for i, line in for_log_quote_lines if i in ret_lines]
+    res_quote_files = [{"number":i,"file_name":file} for i, file in enumerate(file_list) if i in nums_ref]
+    print(response)
+
+    for_log_compose_data = [prompt_str, response, cost, res_quote_lines, res_quote_files]
+    return response,res_quote_files,cost,for_log_compose_data,
+
+def chat(query,model,memory,db,relate_num=3,filter=None, max_token=4000):
+    start_time = time.time()
+    llm = ChatOpenAI(temperature=0, model_name=model)
+    input_data = [query, model, relate_num]
+
     related_data,score_data = documents_search(db,query,top_k=relate_num,filter=filter)
     for i, item in enumerate(related_data):
         item.metadata["rank"] = i
 
-    print(related_data)
+    retriever_data = [related_data, score_data]
+    db_time = time.time()
     
-    selected_info_list, response, cost = select(related_data, query)
-    print(response)
-    print(cost)
-    final_response, file_list, compose_cost, nums_ref = compose(selected_info_list, query, llm, max_token)
-    print(compose_cost)
+    selected_info_list, cost, for_log_select_data = select(related_data, query)
+    select_time = time.time()
 
+    final_response, file_list, compose_cost, for_log_compose_data = compose(selected_info_list, query, llm, max_token)
     total_cost = cost + compose_cost
-    return final_response, file_list, total_cost, nums_ref
+
+    compose_time = time.time()
+    system_data = [start_time, db_time, select_time, compose_time]
+    save_chat_log(input_data, retriever_data, for_log_select_data, for_log_compose_data, system_data)
+    return final_response, file_list, total_cost

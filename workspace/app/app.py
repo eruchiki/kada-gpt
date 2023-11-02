@@ -1,5 +1,4 @@
 import streamlit as st
-from langchain.chat_models import ChatOpenAI
 from langchain.llms import OpenAI
 from lib.pdf_module import *
 from lib.vector_module import *
@@ -18,16 +17,18 @@ memory = ConversationBufferWindowMemory(memory_key="chat_history",k=3)
 def init_page():
     st.set_page_config(
         page_title="組織内文書へ質問",
-        page_icon="🧠"
+        page_icon="🧠",
+        layout="wide"
     )
     st.sidebar.title("メニュー")
     if 'costs' not in st.session_state:
         st.session_state.costs = []
 
 def select_model():
+    st.sidebar.markdown("---")
     if StSession.MODEL_RADIO not in st.session_state:
-        st.session_state[StSession.MODEL_RADIO] = list(StSession.MODEL_OPTIONS.keys())[0]
-        index = 0
+        st.session_state[StSession.MODEL_RADIO] = list(StSession.MODEL_OPTIONS.keys())[2]
+        index = 2
     elif StSession.MODEL_RADIO_TMP not in st.session_state:
         index = list(StSession.MODEL_OPTIONS.keys()).index(st.session_state[StSession.MODEL_RADIO])
     else:
@@ -37,14 +38,14 @@ def select_model():
     for key, value in StSession.MODEL_OPTIONS.items():
         model_help += f"\n\n{key} : {OpenAI.modelname_to_contextsize(value)}"
     
-    st.session_state[StSession.MODEL_RADIO] = st.sidebar.selectbox("モデルを選んでください:",
+    st.session_state[StSession.MODEL_RADIO] = st.sidebar.selectbox("モデルを選んでください",
                      options=list(StSession.MODEL_OPTIONS.keys()),
                      help=model_help,
                      key=StSession.MODEL_RADIO_TMP,
                      index=index)
     st.session_state[StSession.MODEL_NAME] = StSession.MODEL_OPTIONS[st.session_state[StSession.MODEL_RADIO]]
     st.session_state[StSession.MAX_TOKEN] = OpenAI.modelname_to_contextsize(st.session_state[StSession.MODEL_NAME])
-    return ChatOpenAI(temperature=0, model_name=st.session_state[StSession.MODEL_NAME])
+    return st.session_state[StSession.MODEL_NAME]
 
 def setting_page():
     split_option = st.radio("文書分割方法", ("chunk", "sentence"),horizontal=True)
@@ -109,47 +110,53 @@ def page_pdf_upload_and_build_vector_db():
             st.session_state.costs.append(cost)
 
 def page_ask_my_pdf():
-    st.title("組織内文書へ質問")
-    llm = select_model()
+    st.header("組織内文書へ質問")
+    model = select_model()
     db = load_qdrant(host=HOST,port=PORT,collection_name=COLLECTION_NAME)
     container = st.container()
+    form_container = st.container()
     response_container = st.container()
+    if StSession.CHAT_REFERENCE_NUMS not in st.session_state:
+        st.session_state[StSession.CHAT_REFERENCE_NUMS] = index = 4
+    elif StSession.CHAT_REFERENCE_NUMS_TMP not in st.session_state:
+        index = st.session_state[StSession.CHAT_REFERENCE_NUMS]
+    else:
+        index = st.session_state[StSession.CHAT_REFERENCE_NUMS_TMP]
+    st.session_state[StSession.CHAT_REFERENCE_NUMS] = st.sidebar.number_input('質問ごとに取得する参考情報数(既定値:4)',
+                    min_value=1,
+                    max_value=10,
+                    value=index,
+                    step=1,
+                    key=StSession.CHAT_REFERENCE_NUMS_TMP)
+    
+    if StSession.CHAT_QUERY not in st.session_state:
+        st.session_state[StSession.CHAT_QUERY] = index2 = None
+    elif StSession.CHAT_QUERY_TMP not in st.session_state:
+        index2 = st.session_state[StSession.CHAT_QUERY]
+    else:
+        index2 = st.session_state[StSession.CHAT_QUERY_TMP]
 
-    with container:
+    tab1, tab2, tab3 = st.tabs(["質問応答", "詳細", "過去ログ"])
+    with form_container:
         with st.form("question_form", clear_on_submit=False):
-            answer = None
-            st.number_input('1queryに置ける参考情報数',1,10,1,step=1,key="relate_num")
-            query = st.text_area("質問: ", key="input")
+            st.session_state[StSession.CHAT_QUERY] = st.text_area("質問: ", key=StSession.CHAT_QUERY_TMP, value=index2)
             submitted = st.form_submit_button("質問する")
         if submitted:
-            st.session_state[StSession.CHAT_QUERY] = query
             with st.spinner("ChatGPTが入力中 ..."):
-                answer, file_list, cost,nums_ref = chat(st.session_state[StSession.CHAT_QUERY],llm,memory,db,st.session_state.relate_num, max_token=st.session_state[StSession.MAX_TOKEN])
+                answer, file_list, cost = chat(st.session_state[StSession.CHAT_QUERY],model,memory,db,st.session_state[StSession.CHAT_REFERENCE_NUMS], max_token=st.session_state[StSession.MAX_TOKEN])
             st.session_state.costs.append(cost)
             st.session_state[StSession.CHAT_ANSWER] = answer
             st.session_state[StSession.CHAT_RELATE] = file_list
-            st.session_state[StSession.CHAT_REFERENCE_NUMS] = nums_ref
-            # st.session_state[StSession.CHAT_INPUT_TOKEN] = input_token_size
-
-        if StSession.CHAT_ANSWER in st.session_state:
-            with response_container:
-                # st.sidebar.markdown("## 直近の質問のトークン数")
-                # st.sidebar.write(st.session_state[StSession.CHAT_INPUT_TOKEN])
-                st.markdown("## 質問")
-                st.write(st.session_state[StSession.CHAT_QUERY])
-                st.markdown("## 回答")
+        with response_container:
+            if StSession.CHAT_ANSWER in st.session_state:
+                st.markdown("### 回答")
                 st.write(st.session_state[StSession.CHAT_ANSWER])
-                st.markdown("## 参考文献")
-                for i, relate in enumerate(st.session_state[StSession.CHAT_RELATE]):
-                    if i in st.session_state[StSession.CHAT_REFERENCE_NUMS]:
-                        string = f"[{i}] {relate}"
-                        with open(f"./reference_data/{relate}", 'rb') as f:
-                            data = f.read()
-                        st.download_button(label=string, data=data, file_name=relate)
-                # st.markdown("## 参照情報")
-                # for relate in st.session_state[StSession.CHAT_RELATE]:
-                #     st.write(relate.page_content)
-                #     st.write(relate.metadata)
+                st.markdown("### 参考文献")
+                for relate in st.session_state[StSession.CHAT_RELATE]:
+                    string = f"[{relate['number']}] {relate['file_name']}"
+                    with open(f"./reference_data/{relate['file_name']}", 'rb') as f:
+                        data = f.read()
+                    st.download_button(label=string, data=data, file_name=relate['file_name'])
 
 def main():
     init_page() 
@@ -158,6 +165,7 @@ def main():
         page_pdf_upload_and_build_vector_db()
     elif selection == "組織内文書へ質問":
         page_ask_my_pdf()
+    st.sidebar.markdown("---")
     costs = st.session_state.get('costs', [])
     st.sidebar.markdown("## コスト")
     st.sidebar.markdown(f"**Total cost: ${sum(costs):.5f}**")
