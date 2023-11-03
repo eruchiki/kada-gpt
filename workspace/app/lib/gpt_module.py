@@ -155,30 +155,34 @@ def save_memory(memory,query,response):
 
 
 # selectionのプロンプトでGPT3.5に問い合わせ
-async def get_answer(llm_chain, _filename, _info, _query):
-    try:
-        with get_openai_callback() as cb:
-            resp = await asyncio.wait_for(llm_chain.arun({"query":_query,"info":_info,"filename":_filename}), 240)
-        resp = re.sub(r'\s', '', resp)
-        cost = cb.total_cost
-    except Exception as e:
-        print(e)
-        resp = None
-        cost = 0
-    return [resp, cost]
+async def get_answer(llm_chain, _filename, _info, _query, sem, _t):
+    async with sem:
+        print(_t)
+        await asyncio.sleep(_t)
+        try:
+            with get_openai_callback() as cb:
+                resp = await asyncio.wait_for(llm_chain.arun({"query":_query,"info":_info,"filename":_filename}), 40)
+            resp = re.sub(r'\s', '', resp)
+            cost = cb.total_cost
+        except Exception as e:
+            print(e)
+            resp = "エラー"
+            cost = 0
+        return [resp, cost]
 
 # selectionを並列処理
 async def generate_concurrently(info_list, filename_list, query, prompt, model="gpt-3.5-turbo"):
     # モデル定義
-    llm = ChatOpenAI(temperature=0, model_name=model, request_timeout=240)
+    llm = ChatOpenAI(temperature=0, model_name=model, request_timeout=10)
     # プロンプト設定
     llm_chain = LLMChain(
         llm=llm,
         prompt=prompt,
         verbose=True
     )
+    sem = asyncio.Semaphore(4) # セマフォ
     # 並列処理
-    tasks = [get_answer(llm_chain, _filename, _info, query) for _info, _filename in zip(info_list, filename_list)]
+    tasks = [get_answer(llm_chain, _filename, _info, query, sem, _t) for _info, _filename, _t in zip(info_list, filename_list, range(10))]
     return await asyncio.gather(*tasks)
 
 def selection_format(response_list):
@@ -241,36 +245,37 @@ def select(related_data, query):
 
     return selected_info_list, total_cost, for_log_select_data
 
-def compose(selected_info_list, query, llm, max_token):
+def compose(selected_info_list, query, llm):
     prompt = create_prompt_template_for_compose()
     string_info, file_list, for_log_quote_lines = create_prompt_info_for_compose(selected_info_list)
     prompt_str = prompt.format(query=query, info=string_info)
-    input_token_size = num_tokens_from_string(prompt_str)
-    if input_token_size > max_token:
-        response = "トークンサイズが制限を超えています"
-        return response,file_list,0,0
     llm_chain = LLMChain(
-    llm=llm,
-    prompt=prompt,
-    verbose=True,
+        llm=llm,
+        prompt=prompt,
+        verbose=True,
     )
-    with get_openai_callback() as cb:
-        response = llm_chain.run({"query":query,"info":string_info})
+    try:
+        with get_openai_callback() as cb:
+            response = llm_chain.run({"query":query,"info":string_info})
+    except Exception as e:
+        print(e)
+        response = "エラー"
     cost = cb.total_cost
+    print(response)
     ret = re.findall(r"\[([0-9]+)\-[0-9]+\]", response)
+    ret += re.findall(r"\[([0-9]+)\]", response)
     ret_lines = re.findall(r"\[([0-9]+\-[0-9]+)\]", response)
     nums_ref = sorted(list(set(map(int, ret))))
 
     res_quote_lines = [{"number":i,"sentence":line} for i, line in for_log_quote_lines if i in ret_lines]
     res_quote_files = [{"number":i,"file_name":file} for i, file in enumerate(file_list) if i in nums_ref]
-    print(response)
 
     for_log_compose_data = [prompt_str, response, cost, res_quote_lines, res_quote_files]
     return response,res_quote_files,cost,for_log_compose_data,
 
-def chat(query,model,memory,db,relate_num=3,filter=None, max_token=4000):
+def chat(query,model,db,relate_num=3,filter=None):
     start_time = time.time()
-    llm = ChatOpenAI(temperature=0, model_name=model)
+    llm = ChatOpenAI(temperature=0, model_name=model, request_timeout=100)
     input_data = [query, model, relate_num]
 
     related_data,score_data = documents_search(db,query,top_k=relate_num,filter=filter)
@@ -283,7 +288,7 @@ def chat(query,model,memory,db,relate_num=3,filter=None, max_token=4000):
     selected_info_list, cost, for_log_select_data = select(related_data, query)
     select_time = time.time()
 
-    final_response, file_list, compose_cost, for_log_compose_data = compose(selected_info_list, query, llm, max_token)
+    final_response, file_list, compose_cost, for_log_compose_data = compose(selected_info_list, query, llm)
     total_cost = cost + compose_cost
 
     compose_time = time.time()

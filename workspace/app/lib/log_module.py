@@ -1,20 +1,9 @@
 from lib.const import *
-from datetime import datetime, date
+from datetime import datetime
 import ndjson
 import os
 import tiktoken
 
-# サポート外の型が指定されたときの挙動を定義
-def custom_default(o):
-    if hasattr(o, '__iter__'):
-        # イテラブルなものはリストに
-        return list(o)
-    elif isinstance(o, (datetime, date)):
-        # 日時の場合はisoformatに
-        return o.isoformat()
-    else:
-        # それ以外は文字列に
-        return str(o)
 
 # トークン数をカウント
 # モデルにはgpt-3.5-turboやtext-embedding-ada-002がある
@@ -94,8 +83,6 @@ def save_chat_log(input_data, retriever_data, select_data_list, compose_data, sy
         "select": select_data_obj,
         "compose": compose_data_obj
     }
-
-    print(chat_job_obj)
 
     log_path = "./logs"
     os.makedirs(log_path, exist_ok=True)

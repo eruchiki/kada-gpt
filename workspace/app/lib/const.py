@@ -21,3 +21,4 @@ class StSession(metaclass=ConstMeta):
     CHAT_REFERENCE_NUMS = "chat_reference_nums"
     CHAT_REFERENCE_NUMS_TMP = "chat_reference_nums_tmp"
     CHAT_INPUT_TOKEN = "chat_input_token"
+    CHAT_MESSAGES = "chat_messages"
