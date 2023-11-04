@@ -42,7 +42,7 @@ def select_model():
     for key, value in StSession.MODEL_OPTIONS.items():
         model_help += f"\n\n{key} : {OpenAI.modelname_to_contextsize(value)}"
     
-    st.session_state[StSession.MODEL_RADIO] = st.selectbox("モデルを選んでください",
+    st.session_state[StSession.MODEL_RADIO] = st.selectbox("モデルを選んでください(既定値:GPT-4)",
                      options=list(StSession.MODEL_OPTIONS.keys()),
                      help=model_help,
                      key=StSession.MODEL_RADIO_TMP,
@@ -201,7 +201,7 @@ def page_ask_my_pdf():
 
 def main():
     init_page() 
-    selection = st.sidebar.radio("モード", ["PDFをアップロード","組織内文書へ質問"])
+    selection = st.sidebar.radio("モード", ["PDFをアップロード","組織内文書へ質問"], index=1)
     if selection == "PDFをアップロード":
         page_pdf_upload_and_build_vector_db()
     elif selection == "組織内文書へ質問":
