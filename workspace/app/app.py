@@ -42,7 +42,7 @@ def select_model():
     for key, value in StSession.MODEL_OPTIONS.items():
         model_help += f"\n\n{key} : {OpenAI.modelname_to_contextsize(value)}"
     
-    st.session_state[StSession.MODEL_RADIO] = st.selectbox("モデルを選んでください(既定値:GPT-4)",
+    st.session_state[StSession.MODEL_RADIO] = st.selectbox("chatGPTモデル(既定値\:GPT-4)",
                      options=list(StSession.MODEL_OPTIONS.keys()),
                      help=model_help,
                      key=StSession.MODEL_RADIO_TMP,
