@@ -5,6 +5,7 @@ from langchain.prompts import (
     AIMessagePromptTemplate,
     HumanMessagePromptTemplate,
 )
+from langchain.llms import OpenAI
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import Document
@@ -155,10 +156,8 @@ def save_memory(memory,query,response):
 
 
 # selectionのプロンプトでGPT3.5に問い合わせ
-async def get_answer(llm_chain, _filename, _info, _query, sem, _t):
+async def get_answer(llm_chain, _filename, _info, _query, sem):
     async with sem:
-        print(_t)
-        await asyncio.sleep(_t)
         try:
             with get_openai_callback() as cb:
                 resp = await asyncio.wait_for(llm_chain.arun({"query":_query,"info":_info,"filename":_filename}), 40)
@@ -166,7 +165,7 @@ async def get_answer(llm_chain, _filename, _info, _query, sem, _t):
             cost = cb.total_cost
         except Exception as e:
             print(e)
-            resp = "エラー"
+            resp = "エラー: " + str(e)
             cost = 0
         return [resp, cost]
 
@@ -182,7 +181,7 @@ async def generate_concurrently(info_list, filename_list, query, prompt, model="
     )
     sem = asyncio.Semaphore(4) # セマフォ
     # 並列処理
-    tasks = [get_answer(llm_chain, _filename, _info, query, sem, _t) for _info, _filename, _t in zip(info_list, filename_list, range(10))]
+    tasks = [get_answer(llm_chain, _filename, _info, query, sem) for _info, _filename in zip(info_list, filename_list)]
     return await asyncio.gather(*tasks)
 
 def selection_format(response_list):
@@ -259,7 +258,7 @@ def compose(selected_info_list, query, llm):
             response = llm_chain.run({"query":query,"info":string_info})
     except Exception as e:
         print(e)
-        response = "エラー"
+        response = "エラー: " + str(e)
     cost = cb.total_cost
     print(response)
     ret = re.findall(r"\[([0-9]+)\-[0-9]+\]", response)
@@ -275,7 +274,7 @@ def compose(selected_info_list, query, llm):
 
 def chat(query,model,db,relate_num=3,filter=None):
     start_time = time.time()
-    llm = ChatOpenAI(temperature=0, model_name=model, request_timeout=100)
+    llm = ChatOpenAI(temperature=0, model_name=model, request_timeout=240)
     input_data = [query, model, relate_num]
 
     related_data,score_data = documents_search(db,query,top_k=relate_num,filter=filter)

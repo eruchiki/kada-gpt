@@ -4,6 +4,7 @@ import ndjson
 import os
 import tiktoken
 
+LOG_PAHT = "./logs"
 
 # トークン数をカウント
 # モデルにはgpt-3.5-turboやtext-embedding-ada-002がある
@@ -66,14 +67,14 @@ def save_chat_log(input_data, retriever_data, select_data_list, compose_data, sy
     select_time_t = select_time - db_time
     compose_time_t = compose_time - select_time
     system_data_obj = {
-        "total_cost": total_cost,
         "start_in": datetime.fromtimestamp(start_time).strftime('%Y/%m/%d %H:%M:%S.%f'),
         "duration": {
             "retriever": db_time_t,
             "select": select_time_t,
             "compose": compose_time_t,
             "total": total_time_t
-        }
+        },
+        "total_cost": total_cost
     }
 
     chat_job_obj = {
@@ -84,9 +85,23 @@ def save_chat_log(input_data, retriever_data, select_data_list, compose_data, sy
         "compose": compose_data_obj
     }
 
-    log_path = "./logs"
-    os.makedirs(log_path, exist_ok=True)
+    os.makedirs(LOG_PAHT, exist_ok=True)
     filename = "chat-log.jsonl"
-    with open(os.path.join(log_path, filename), mode="a", encoding="utf-8") as f:
+    with open(os.path.join(LOG_PAHT, filename), mode="a", encoding="utf-8") as f:
         writer = ndjson.writer(f, ensure_ascii=False)
         writer.writerow(chat_job_obj)
+
+
+def save_emb_log(split_text, total_token):
+    emb_log_obj = {
+        "date": datetime.now().strftime('%Y/%m/%d %H:%M:%S.%f'),
+        "split_num": len(split_text),
+        "token": [num_tokens_from_string(item) for item in split_text],
+        "total_cost": 0.0001 * (total_token / 1000)
+    }
+
+    os.makedirs(LOG_PAHT, exist_ok=True)
+    filename = "emb-log.jsonl"
+    with open(os.path.join(LOG_PAHT, filename), mode="a", encoding="utf-8") as f:
+        writer = ndjson.writer(f, ensure_ascii=False)
+        writer.writerow(emb_log_obj)

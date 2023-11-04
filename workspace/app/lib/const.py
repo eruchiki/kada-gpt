@@ -22,3 +22,7 @@ class StSession(metaclass=ConstMeta):
     CHAT_REFERENCE_NUMS_TMP = "chat_reference_nums_tmp"
     CHAT_INPUT_TOKEN = "chat_input_token"
     CHAT_MESSAGES = "chat_messages"
+    DOC_CHUNK_SIZE = "doc_chunk_size"
+    DOC_CHUNK_SIZE_TMP = "doc_chunk_size_tmp"
+    DOC_FILE_DATA = "doc_file_data"
+    UPLOADER_KEY = "uploader_key"
