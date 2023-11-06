@@ -1,5 +1,7 @@
 # kada-gpt
 
+**アプリ用のマニュアル**→[./doc/manual.md](./doc/manual.md)
+
 ## Overview
 chatGPTを用いた組織内文書検索，対話を実現するプロジェクト
 
@@ -10,28 +12,34 @@ chatGPTを用いた組織内文書検索，対話を実現するプロジェク�
   - Linux
 - OpenAI API key
 
-## Usage
+## 今すぐ試す(プレビュー環境)
+```bash
+$ docker compose up -d
+```
+
+
+## Usage(開発用環境)
 ### 初回セットアップ
 プロジェクトディレクトリ直下で操作
 ```bash
 # 初回起動
-$ docker compose up -d
+$ docker compose -f compose-dev.yml -p dev-gpt up -d
 
 # 起動
-$ docker compose start
+$ docker compose -p dev-gpt start
 
 # 停止
-$ docker compose stop
+$ docker compose -p dev-gpt stop
 ```
 
 ### イメージ更新
 ```bash
 # 更新
-docker compose up --build -d
+docker compose -f compose-dev.yml -p dev-gpt up --build -d
 
 # 以前のコンテナを削除してから更新
-docker compose down
-docker compose up -d
+docker compose -p dev-gpt down
+docker compose -f compose-dev.yml -p dev-gpt up -d
 ```
 
 ## Description

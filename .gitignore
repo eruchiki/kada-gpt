@@ -10,6 +10,8 @@ pdf_to_text/
 data/
 process_data/
 reference_data/
+reference_files/
 storage/
 storage_context/
 log.json
+logs/

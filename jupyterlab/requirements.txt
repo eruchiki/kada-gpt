@@ -21,3 +21,5 @@ nltk
 qdrant-client
 streamlit
 pymupdf
+transformers-openai-api
+ndjson

@@ -25,7 +25,4 @@ def load_qdrant(collection_name,host='qdrant',port=6333):
     )
 
 def insert_data(documents,embeddings,host,port,collection_name):
-    with get_openai_callback() as cb:
-        qdrant = Qdrant.from_documents(documents, embeddings,host=host,port=port, collection_name= collection_name)
-    cost = cb.total_cost
-    return cost
+    qdrant = Qdrant.from_documents(documents, embeddings,host=host,port=port, collection_name=collection_name)

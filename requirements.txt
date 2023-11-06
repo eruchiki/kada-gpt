@@ -1,0 +1,7 @@
+numpy
+openai
+llama-index
+qdrant-client
+streamlit
+pymupdf
+ndjson

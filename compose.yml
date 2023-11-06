@@ -1,0 +1,32 @@
+services:
+  streamlit:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: streamlit
+    restart: always
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./workspace/app:/app
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      - qdrant
+    networks:
+      - kada-gpt-rag
+
+  qdrant:
+    image: qdrant/qdrant:v1.5.0
+    container_name: qdrant
+    restart: always
+    volumes:
+      - ./qdrant/storage:/qdrant/storage
+      - ./qdrant/snapshots:/qdrant/snapshots
+    networks:
+      - kada-gpt-rag
+
+networks:
+  kada-gpt-rag:
+    name: kada-gpt-rag
+    driver: bridge
