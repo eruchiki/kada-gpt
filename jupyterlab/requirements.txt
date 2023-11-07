@@ -14,12 +14,10 @@ matplotlib
 seaborn 
 requests 
 beautifulsoup4 
-openai
 llama-index
-openai
+openai<1.0.0
 nltk
 qdrant-client
 streamlit
 pymupdf
-transformers-openai-api
 ndjson

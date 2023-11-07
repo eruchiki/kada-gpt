@@ -96,13 +96,15 @@ def chunk_split(text_data,chunk_num=6):
 def create_prompt_template_for_select():
     system_template = """質問文と、その回答として利用できるかわかっていないドキュメントがあります。
 質問文に対して回答を考えるときに参考になりそうなドキュメントの番号を取り出してください。
+質問文と関係のありそうなドキュメントの番号も取り出してください．
 番号付きドキュメントそれぞれは、元は先頭から結合された1つの文書でした。
 ドキュメントのファイル名が与えられるので考慮してください。
 
 # 制約
 - 番号について詳細かつ正確に回答してください
-- 参考になりそうな文章の番号を全て取り出してください
-- 参考になりそうな情報が複数ある場合は、必ずすべて答えてください
+- 回答生成の参考になりそうな文章の番号を全て取り出してください
+- 質問と関係のありそうな文章の番号も全て取り出してください
+- 参考になりそうな情報や関係のありそうな情報が複数ある場合は、必ずすべて答えてください
 - 参考になりそうな情報は広めに取ってください
 - 番号に該当する文章は出力しないでください
 - ドキュメント全ての番号を選択するのはコスパが悪いので、絶対に避けてください
@@ -115,6 +117,7 @@ def create_prompt_template_for_select():
 - 回答の生成にはドキュメントの[892]から[901]、[1023]から[1028]の情報が使えそうです
 - 回答の生成にはドキュメントの[97]の情報が使えそうです
 - 回答の生成にはドキュメントの[425]、[644]から[656]、[700]の情報が使えそうです
+- 回答の生成にはドキュメントの[101]から[139]の情報が使えそうです
 - 回答の生成には使えそうな情報がありません
 
 # ドキュメントのファイル名
@@ -160,7 +163,7 @@ async def get_answer(llm_chain, _filename, _info, _query, sem):
     async with sem:
         try:
             with get_openai_callback() as cb:
-                resp = await asyncio.wait_for(llm_chain.arun({"query":_query,"info":_info,"filename":_filename}), 40)
+                resp = await asyncio.wait_for(llm_chain.arun({"query":_query,"info":_info,"filename":_filename}), 60)
             resp = re.sub(r'\s', '', resp)
             cost = cb.total_cost
         except Exception as e:
@@ -172,7 +175,7 @@ async def get_answer(llm_chain, _filename, _info, _query, sem):
 # selectionを並列処理
 async def generate_concurrently(info_list, filename_list, query, prompt, model="gpt-3.5-turbo"):
     # モデル定義
-    llm = ChatOpenAI(temperature=0, model_name=model, request_timeout=10)
+    llm = ChatOpenAI(temperature=0, model_name=model, request_timeout=15)
     # プロンプト設定
     llm_chain = LLMChain(
         llm=llm,
@@ -272,7 +275,7 @@ def compose(selected_info_list, query, llm):
     for_log_compose_data = [prompt_str, response, cost, res_quote_lines, res_quote_files]
     return response,res_quote_files,cost,for_log_compose_data,
 
-def chat(query,model,db,relate_num=3,filter=None):
+def chat(query,model,db,relate_num=4,filter=None):
     start_time = time.time()
     llm = ChatOpenAI(temperature=0, model_name=model, request_timeout=240)
     input_data = [query, model, relate_num]
@@ -291,6 +294,36 @@ def chat(query,model,db,relate_num=3,filter=None):
     total_cost = cost + compose_cost
 
     compose_time = time.time()
-    system_data = [start_time, db_time, select_time, compose_time]
+    system_data = [start_time, db_time, select_time, compose_time, "selection"]
     save_chat_log(input_data, retriever_data, for_log_select_data, for_log_compose_data, system_data)
-    return final_response, file_list, total_cost
+    return final_response, file_list, total_cost, start_time
+
+def chat_default(query,model,db,relate_num=4,filter=None):
+    start_time = time.time()
+    llm = ChatOpenAI(temperature=0, model_name=model, request_timeout=300)
+    input_data = [query, model, relate_num]
+
+    related_data,score_data = documents_search(db,query,top_k=relate_num,filter=filter)
+    for i, item in enumerate(related_data):
+        item.metadata["rank"] = i
+    related_info = []
+    for relate in related_data:
+        group = []
+        split_text = chunk_split(relate.page_content)
+        for i, text in enumerate(split_text):
+            info = Document(
+                page_content=text,
+                metadata={"filename":relate.metadata["filename"], "rank":relate.metadata["rank"], "item_number":i}
+            )
+            group.append(info)
+        related_info.append([group])
+
+    retriever_data = [related_data, score_data]
+    db_time = time.time()
+
+    final_response, file_list, total_cost, for_log_compose_data = compose(related_info, query, llm)
+
+    compose_time = time.time()
+    system_data = [start_time, db_time, 0, compose_time, "default"]
+    save_chat_log(input_data, retriever_data, [], for_log_compose_data, system_data)
+    return final_response, file_list, total_cost, start_time
