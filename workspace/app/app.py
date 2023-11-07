@@ -42,7 +42,7 @@ def select_model():
     for key, value in StSession.MODEL_OPTIONS.items():
         model_help += f"\n\n{key} : {OpenAI.modelname_to_contextsize(value)}"
     
-    st.session_state[StSession.MODEL_RADIO] = st.selectbox("chatGPTモデル(既定値\:GPT-4)",
+    st.session_state[StSession.MODEL_RADIO] = st.selectbox("chatGPTモデル(既定\:GPT-4)",
                      options=list(StSession.MODEL_OPTIONS.keys()),
                      help=model_help,
                      key=StSession.MODEL_RADIO_TMP,
@@ -56,12 +56,14 @@ def input_num_of_reference():
         index = st.session_state[StSession.CHAT_REFERENCE_NUMS]
     else:
         index = st.session_state[StSession.CHAT_REFERENCE_NUMS_TMP]
-    st.session_state[StSession.CHAT_REFERENCE_NUMS] = st.number_input('質問ごとに取得する参考情報数(既定値:4)',
+    st.session_state[StSession.CHAT_REFERENCE_NUMS] = st.number_input('取得する参考情報数(既定:4)',
                     min_value=1,
                     max_value=10,
                     value=index,
                     step=1,
-                    key=StSession.CHAT_REFERENCE_NUMS_TMP)
+                    key=StSession.CHAT_REFERENCE_NUMS_TMP,
+                    help="参考情報数によってはモデルのトークン上限に到達する可能性があります．\n\nエラーが発生した場合は数値を小さくしてください．"
+                    )
 
 
 def input_query_text():
@@ -81,7 +83,7 @@ def input_size_of_chunk():
         index = st.session_state[StSession.DOC_CHUNK_SIZE]
     else:
         index = st.session_state[StSession.DOC_CHUNK_SIZE_TMP]
-    st.session_state[StSession.DOC_CHUNK_SIZE] = st.number_input('分割時のchunkサイズ(既定値:1000)',
+    st.session_state[StSession.DOC_CHUNK_SIZE] = st.number_input('分割時のchunkサイズ(既定:1000)',
                     min_value=100,
                     max_value=2500,
                     value=index,
@@ -167,7 +169,7 @@ def page_ask_my_pdf():
 
     with form_container.container():
         with st.form("question_form", clear_on_submit=False):
-            col1, col2 = st.columns((2, 1))
+            col1, col2 = st.columns((3, 1))
             with col1:
                 input_query_text()
             with col2:
@@ -178,16 +180,19 @@ def page_ask_my_pdf():
     if submitted:
         # form_container.empty()
         with st.spinner("ChatGPTが入力中 ..."):
-            answer, file_list, cost = chat(st.session_state[StSession.CHAT_QUERY],st.session_state[StSession.MODEL_NAME],db,st.session_state[StSession.CHAT_REFERENCE_NUMS])
+            answer, file_list, cost, start_time = chat(st.session_state[StSession.CHAT_QUERY],st.session_state[StSession.MODEL_NAME],db,st.session_state[StSession.CHAT_REFERENCE_NUMS])
         st.session_state.costs.append(cost)
-        st.session_state[StSession.CHAT_MESSAGES].append({
+        st.session_state[StSession.CHAT_MESSAGES].insert(0, {
+            "time": start_time,
             "query": st.session_state[StSession.CHAT_QUERY],
             "response": answer,
             "reference": file_list,
+            "feedback": {"reference_level": None, "accuracy": None},
         })
 
-    if st.session_state[StSession.CHAT_MESSAGES] != []:
-        for i, message in enumerate(reversed(st.session_state[StSession.CHAT_MESSAGES])):
+    for i, message in enumerate(st.session_state[StSession.CHAT_MESSAGES]):
+        h_col1, h_col2 = st.columns((3, 1))
+        with h_col1:
             with st.chat_message('user'):
                 st.markdown(message['query'])
             with st.chat_message('assistant'):
@@ -197,7 +202,31 @@ def page_ask_my_pdf():
                     with open(f"./reference_files/{relate['file_name']}", 'rb') as f:
                         data = f.read()
                     st.download_button(label=string, data=data, file_name=relate['file_name'], key=f"{i}-{j}-chat_dl_bt")
-            st.markdown("---")
+        with h_col2:
+            h_container = st.empty()
+            with h_container.container():
+                feedback_tmp = st.slider(label="参考度を%で教えてください", min_value=0, max_value=100, value=50, step=1, key=f"{i}-chat_fb_sld", help="情報を探す時に，どの程度参考になったかを回答してください．だいたいの数値で大丈夫です．")
+                feedback_tmp2 = st.selectbox("回答の正確性を教えてください",
+                     options=[
+                         "わからない",
+                         "極めて正確",
+                         "正確だが情報不足",
+                         "一部情報が間違い",
+                         "全情報が間違い",
+                         "質問と関係なし"
+                         ],
+                     help="参考情報を元々知っている場合は答えてください．アップロードしたPDFの内容に基づいて選択してください．",
+                     key=f"{i}-chat_fb_select",
+                     )
+                ok_bt = st.button("アンケート保存", type='primary', key=f"{i}-chat_fb_bt", use_container_width=True)
+            if ok_bt:
+                message["feedback"]["reference_level"] = feedback_tmp
+                message["feedback"]["accuracy"] = feedback_tmp2
+                save_feedback(message)
+            if message["feedback"]["reference_level"] != None:
+                h_container.empty()
+                st.markdown(f"[アンケート回答済]  \n- 参考度: {message['feedback']['reference_level']}%  \n- 正確性: {message['feedback']['accuracy']}")
+        st.markdown("---")
 
 def main():
     init_page() 

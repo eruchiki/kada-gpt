@@ -92,6 +92,19 @@ def save_chat_log(input_data, retriever_data, select_data_list, compose_data, sy
         writer.writerow(chat_job_obj)
 
 
+def save_feedback(message):
+    feedback_obj = {
+        "chat_date": datetime.fromtimestamp(message["time"]).strftime('%Y/%m/%d %H:%M:%S.%f'),
+        "feedback": message["feedback"]
+    }
+
+    os.makedirs(LOG_PAHT, exist_ok=True)
+    filename = "feedback.jsonl"
+    with open(os.path.join(LOG_PAHT, filename), mode="a", encoding="utf-8") as f:
+        writer = ndjson.writer(f, ensure_ascii=False)
+        writer.writerow(feedback_obj)
+
+
 def save_emb_log(split_text, total_token):
     emb_log_obj = {
         "date": datetime.now().strftime('%Y/%m/%d %H:%M:%S.%f'),
