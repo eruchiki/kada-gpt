@@ -18,7 +18,7 @@ COLLECTION_NAME = "kadagpt_1"
 def init_page():
     st.set_page_config(
         page_title="組織内文書へ質問",
-        page_icon="🧠",
+        page_icon="🤖",
         layout="wide"
     )
     st.sidebar.title("メニュー")
@@ -58,7 +58,7 @@ def select_method():
     else:
         index = list(StSession.METHOD_OPTIONS.keys()).index(st.session_state[StSession.METHOD_SELECT_TMP])
     
-    st.session_state[StSession.METHOD_SELECT] = st.selectbox("適応手法(既定\:検討手法)",
+    st.session_state[StSession.METHOD_SELECT] = st.selectbox("適用手法(既定\:検討手法)",
                      options=list(StSession.METHOD_OPTIONS.keys()),
                      help="従来手法は一般的なRAG．検討手法は従来手法に加えて，retrieveの後にselectを行う．",
                      key=StSession.METHOD_SELECT_TMP,
