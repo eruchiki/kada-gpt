@@ -49,6 +49,22 @@ def select_model():
                      index=index)
     st.session_state[StSession.MODEL_NAME] = StSession.MODEL_OPTIONS[st.session_state[StSession.MODEL_RADIO]]
 
+def select_method():
+    if StSession.METHOD_SELECT not in st.session_state:
+        st.session_state[StSession.METHOD_SELECT] = list(StSession.METHOD_OPTIONS.keys())[1]
+        index = 1
+    elif StSession.METHOD_SELECT_TMP not in st.session_state:
+        index = list(StSession.METHOD_OPTIONS.keys()).index(st.session_state[StSession.METHOD_SELECT])
+    else:
+        index = list(StSession.METHOD_OPTIONS.keys()).index(st.session_state[StSession.METHOD_SELECT_TMP])
+    
+    st.session_state[StSession.METHOD_SELECT] = st.selectbox("適応手法(既定\:検討手法)",
+                     options=list(StSession.METHOD_OPTIONS.keys()),
+                     help="従来手法は一般的なRAG．検討手法は従来手法に加えて，retrieveの後にselectを行う．",
+                     key=StSession.METHOD_SELECT_TMP,
+                     index=index)
+    st.session_state[StSession.METHOD_NAME] = StSession.METHOD_OPTIONS[st.session_state[StSession.METHOD_SELECT]]
+
 def input_num_of_reference():
     if StSession.CHAT_REFERENCE_NUMS not in st.session_state:
         st.session_state[StSession.CHAT_REFERENCE_NUMS] = index = 4
@@ -166,21 +182,24 @@ def page_ask_my_pdf():
     db = load_qdrant(host=HOST,port=PORT,collection_name=COLLECTION_NAME)
     form_container = st.empty()
 
-
     with form_container.container():
         with st.form("question_form", clear_on_submit=False):
-            col1, col2 = st.columns((3, 1))
+            col1, col2, col3 = st.columns((2, 1, 1), gap="medium")
             with col1:
                 input_query_text()
             with col2:
                 select_model()
                 input_num_of_reference()
+            with col3:
+                select_method()
             submitted = st.form_submit_button("質問する")
 
     if submitted:
-        # form_container.empty()
         with st.spinner("ChatGPTが入力中 ..."):
-            answer, file_list, cost, start_time = chat(st.session_state[StSession.CHAT_QUERY],st.session_state[StSession.MODEL_NAME],db,st.session_state[StSession.CHAT_REFERENCE_NUMS])
+            if st.session_state[StSession.METHOD_NAME] == "default":
+                answer, file_list, cost, start_time = chat_default(st.session_state[StSession.CHAT_QUERY],st.session_state[StSession.MODEL_NAME],db,st.session_state[StSession.CHAT_REFERENCE_NUMS])
+            elif st.session_state[StSession.METHOD_NAME] == "select":
+                answer, file_list, cost, start_time = chat(st.session_state[StSession.CHAT_QUERY],st.session_state[StSession.MODEL_NAME],db,st.session_state[StSession.CHAT_REFERENCE_NUMS])
         st.session_state.costs.append(cost)
         st.session_state[StSession.CHAT_MESSAGES].insert(0, {
             "time": start_time,
@@ -191,7 +210,7 @@ def page_ask_my_pdf():
         })
 
     for i, message in enumerate(st.session_state[StSession.CHAT_MESSAGES]):
-        h_col1, h_col2 = st.columns((3, 1))
+        h_col1, h_col2 = st.columns((3, 1), gap="medium")
         with h_col1:
             with st.chat_message('user'):
                 st.markdown(message['query'])
@@ -239,8 +258,11 @@ def main():
     costs = st.session_state.get('costs', [])
     st.sidebar.markdown("## コスト")
     st.sidebar.markdown(f"**Total cost: ${sum(costs):.5f}**")
-    for cost in costs:
-        st.sidebar.markdown(f"- ${cost:.5f}")
+    for i, cost in enumerate(reversed(costs)):
+        if i == 0:
+            st.sidebar.markdown(f"- ${cost:.5f} (最新の履歴)")
+        else:
+            st.sidebar.markdown(f"- ${cost:.5f}")
 
 
 if __name__ == '__main__':

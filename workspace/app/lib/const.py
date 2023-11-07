@@ -13,6 +13,13 @@ class StSession(metaclass=ConstMeta):
                     "GPT-3.5-16k": "gpt-3.5-turbo-16k",
                     "GPT-4": "gpt-4",
                     "GPT-4-32k": "gpt-4-32k"}
+    METHOD_SELECT = "method_select"
+    METHOD_SELECT_TMP = "method_select_tmp"
+    METHOD_OPTIONS = {
+        "従来手法": "default",
+        "検討手法": "select",
+    }
+    METHOD_NAME = "method_name"
     MAX_TOKEN = "max_token"
     CHAT_QUERY = "chat_query"
     CHAT_QUERY_TMP = "chat_query_tmp"

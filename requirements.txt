@@ -1,7 +1,7 @@
-numpy
-openai
-llama-index
-qdrant-client
-streamlit
-pymupdf
-ndjson
+numpy==1.26.1
+openai==0.28.1
+llama-index==0.8.62
+qdrant-client==1.6.4
+streamlit==1.28.1
+ndjson==0.3.1
+PyMuPDF==1.23.6

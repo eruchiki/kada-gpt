@@ -275,7 +275,7 @@ def compose(selected_info_list, query, llm):
     for_log_compose_data = [prompt_str, response, cost, res_quote_lines, res_quote_files]
     return response,res_quote_files,cost,for_log_compose_data,
 
-def chat(query,model,db,relate_num=3,filter=None):
+def chat(query,model,db,relate_num=4,filter=None):
     start_time = time.time()
     llm = ChatOpenAI(temperature=0, model_name=model, request_timeout=240)
     input_data = [query, model, relate_num]
@@ -294,6 +294,36 @@ def chat(query,model,db,relate_num=3,filter=None):
     total_cost = cost + compose_cost
 
     compose_time = time.time()
-    system_data = [start_time, db_time, select_time, compose_time]
+    system_data = [start_time, db_time, select_time, compose_time, "selection"]
     save_chat_log(input_data, retriever_data, for_log_select_data, for_log_compose_data, system_data)
+    return final_response, file_list, total_cost, start_time
+
+def chat_default(query,model,db,relate_num=4,filter=None):
+    start_time = time.time()
+    llm = ChatOpenAI(temperature=0, model_name=model, request_timeout=300)
+    input_data = [query, model, relate_num]
+
+    related_data,score_data = documents_search(db,query,top_k=relate_num,filter=filter)
+    for i, item in enumerate(related_data):
+        item.metadata["rank"] = i
+    related_info = []
+    for relate in related_data:
+        group = []
+        split_text = chunk_split(relate.page_content)
+        for i, text in enumerate(split_text):
+            info = Document(
+                page_content=text,
+                metadata={"filename":relate.metadata["filename"], "rank":relate.metadata["rank"], "item_number":i}
+            )
+            group.append(info)
+        related_info.append([group])
+
+    retriever_data = [related_data, score_data]
+    db_time = time.time()
+
+    final_response, file_list, total_cost, for_log_compose_data = compose(related_info, query, llm)
+
+    compose_time = time.time()
+    system_data = [start_time, db_time, 0, compose_time, "default"]
+    save_chat_log(input_data, retriever_data, [], for_log_compose_data, system_data)
     return final_response, file_list, total_cost, start_time

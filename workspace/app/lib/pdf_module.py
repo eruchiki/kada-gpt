@@ -6,7 +6,7 @@ from unicodedata import normalize
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 
-def pdf_reader(file_data,skip_page=[],table_save=True):
+def pdf_reader(file_data,skip_page=[],table_save=False):
     doc = fitz.open(stream=file_data.read(), filetype="pdf")
 
     text_data = ""
@@ -14,8 +14,10 @@ def pdf_reader(file_data,skip_page=[],table_save=True):
         page_data = doc[page]
         if page not in skip_page:
             text_data += page_data.get_text()
-        table_data = page_data.find_tables()
-        if len(table_data.tables) > 0 and table_save:
+        if table_save:
+            table_data = page_data.find_tables()
+            if len(table_data.tables) == 0:
+                continue
             table_text = ""
             for tbl in table_data:
                 for t in tbl.extract():
