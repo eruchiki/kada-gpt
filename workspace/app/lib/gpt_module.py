@@ -157,13 +157,12 @@ def save_memory(memory,query,response):
     memory.chat_memory.add_ai_message(response)
 
 
-
 # selectionのプロンプトでGPT3.5に問い合わせ
 async def get_answer(llm_chain, _filename, _info, _query, sem):
     async with sem:
         try:
             with get_openai_callback() as cb:
-                resp = await asyncio.wait_for(llm_chain.arun({"query":_query,"info":_info,"filename":_filename}), 60)
+                resp = await asyncio.wait_for(llm_chain.arun({"query":_query,"info":_info,"filename":_filename}), 65)
             resp = re.sub(r'\s', '', resp)
             cost = cb.total_cost
         except Exception as e:
@@ -175,14 +174,14 @@ async def get_answer(llm_chain, _filename, _info, _query, sem):
 # selectionを並列処理
 async def generate_concurrently(info_list, filename_list, query, prompt, model="gpt-3.5-turbo"):
     # モデル定義
-    llm = ChatOpenAI(temperature=0, model_name=model, request_timeout=15)
+    llm = ChatOpenAI(temperature=0, model_name=model, request_timeout=12)
     # プロンプト設定
     llm_chain = LLMChain(
         llm=llm,
         prompt=prompt,
         verbose=True
     )
-    sem = asyncio.Semaphore(4) # セマフォ
+    sem = asyncio.Semaphore(10) # セマフォ
     # 並列処理
     tasks = [get_answer(llm_chain, _filename, _info, query, sem) for _info, _filename in zip(info_list, filename_list)]
     return await asyncio.gather(*tasks)
@@ -324,6 +323,6 @@ def chat_default(query,model,db,relate_num=4,filter=None):
     final_response, file_list, total_cost, for_log_compose_data = compose(related_info, query, llm)
 
     compose_time = time.time()
-    system_data = [start_time, db_time, 0, compose_time, "default"]
+    system_data = [start_time, db_time, db_time, compose_time, "default"]
     save_chat_log(input_data, retriever_data, [], for_log_compose_data, system_data)
     return final_response, file_list, total_cost, start_time

@@ -22,7 +22,7 @@ def init_page():
         layout="wide",
         menu_items={
             "Report a Bug":"mailto:s20t331@kagawa-u.ac.jp",
-            "About":"KadaGPT v0.2.1\n\n連絡先はこちら\n\n- 増田嶺(香川大学) s20t331@kagawa-u.ac.jp\n- 岩本和真(香川大学) s20t301@kagawa-u.ac.jp\n- 道信祐成(香川大学) s20t333@kagawa-u.ac.jp"
+            "About":"KadaGPT v0.2.2\n\n連絡先はこちら\n\n- 増田嶺(香川大学) s20t331@kagawa-u.ac.jp\n- 岩本和真(香川大学) s20t301@kagawa-u.ac.jp\n- 道信祐成(香川大学) s20t333@kagawa-u.ac.jp"
         }
     )
     st.sidebar.title("メニュー")
@@ -78,7 +78,7 @@ def input_num_of_reference():
         index = st.session_state[StSession.CHAT_REFERENCE_NUMS_TMP]
     st.session_state[StSession.CHAT_REFERENCE_NUMS] = st.number_input('取得する参考情報数(既定:4)',
                     min_value=1,
-                    max_value=10,
+                    max_value=20,
                     value=index,
                     step=1,
                     key=StSession.CHAT_REFERENCE_NUMS_TMP,
@@ -199,7 +199,7 @@ def page_ask_my_pdf():
             submitted = st.form_submit_button("質問する")
 
     if submitted:
-        with st.spinner("ChatGPTが入力中 ..."):
+        with st.spinner("ChatGPTが入力中...処理に数分かかる場合があります..."):
             if st.session_state[StSession.METHOD_NAME] == "default":
                 answer, file_list, cost, start_time = chat_default(st.session_state[StSession.CHAT_QUERY],st.session_state[StSession.MODEL_NAME],db,st.session_state[StSession.CHAT_REFERENCE_NUMS])
             elif st.session_state[StSession.METHOD_NAME] == "select":
@@ -228,7 +228,7 @@ def page_ask_my_pdf():
         with h_col2:
             h_container = st.empty()
             with h_container.container():
-                feedback_tmp = st.slider(label="参考度を%で教えてください", min_value=0, max_value=100, value=50, step=1, key=f"{i}-chat_fb_sld", help="情報を探す時に，どの程度参考になったかを回答してください．だいたいの数値で大丈夫です．")
+                feedback_tmp = st.slider(label="参考度を5段階で教えてください", min_value=1, max_value=5, value=3, step=1, key=f"{i}-chat_fb_sld", help="情報を探す時に，どの程度参考になったかを回答してください．5が最も参考になった，1が全く参考にならなかった評価です．")
                 feedback_tmp2 = st.selectbox("回答の正確性を教えてください",
                      options=[
                          "わからない",
@@ -236,7 +236,9 @@ def page_ask_my_pdf():
                          "正確だが情報不足",
                          "一部情報が間違い",
                          "全情報が間違い",
-                         "質問と関係なし"
+                         "質問と関係なし",
+                         "回答せず",
+                         "エラー出力"
                          ],
                      help="参考情報を元々知っている場合は答えてください．アップロードしたPDFの内容に基づいて選択してください．",
                      key=f"{i}-chat_fb_select",
@@ -248,7 +250,7 @@ def page_ask_my_pdf():
                 save_feedback(message)
             if message["feedback"]["reference_level"] != None:
                 h_container.empty()
-                st.markdown(f"[アンケート回答済]  \n- 参考度: {message['feedback']['reference_level']}%  \n- 正確性: {message['feedback']['accuracy']}")
+                st.markdown(f"[アンケート回答済]  \n- 参考度: {message['feedback']['reference_level']}  \n- 正確性: {message['feedback']['accuracy']}")
         st.markdown("---")
 
 def main():
