@@ -17,9 +17,13 @@ COLLECTION_NAME = "kadagpt_1"
 
 def init_page():
     st.set_page_config(
-        page_title="組織内文書へ質問",
+        page_title="KadaGPT",
         page_icon="🤖",
-        layout="wide"
+        layout="wide",
+        menu_items={
+            "Report a Bug":"mailto:s20t331@kagawa-u.ac.jp",
+            "About":"KadaGPT v0.2.1\n\n連絡先はこちら\n\n- 増田嶺(香川大学) s20t331@kagawa-u.ac.jp\n- 岩本和真(香川大学) s20t301@kagawa-u.ac.jp\n- 道信祐成(香川大学) s20t333@kagawa-u.ac.jp"
+        }
     )
     st.sidebar.title("メニュー")
     if 'costs' not in st.session_state:
