@@ -1,6 +1,6 @@
-# kada-gpt
+# KadaGPT
 
-**アプリ用のマニュアル**→[./doc/manual.md](./doc/manual.md)
+[**アプリ用のマニュアル**](./doc/manual.md)
 
 ## Overview
 chatGPTを用いた組織内文書検索，対話を実現するプロジェクト
