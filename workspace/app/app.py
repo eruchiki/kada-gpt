@@ -250,7 +250,7 @@ def page_ask_my_pdf():
                 save_feedback(message)
             if message["feedback"]["reference_level"] != None:
                 h_container.empty()
-                st.markdown(f"[アンケート回答済]  \n- 参考度: {message['feedback']['reference_level']}%  \n- 正確性: {message['feedback']['accuracy']}")
+                st.markdown(f"[アンケート回答済]  \n- 参考度: {message['feedback']['reference_level']}  \n- 正確性: {message['feedback']['accuracy']}")
         st.markdown("---")
 
 def main():
