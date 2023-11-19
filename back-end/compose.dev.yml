@@ -1,0 +1,53 @@
+services:
+  api:
+    build:
+      context: ./fastapi/
+      dockerfile: Dockerfile
+    volumes:
+      - api-venv:/src/.venv
+      - api-vscode:/src/.vscode-server
+      - api-mypy-cache:/src/.mypy_cache
+      - ./fastapi:/src
+      - ./log/api:/log
+    ports:
+      - 8080:8000
+    networks:
+      - kada-gpt
+    tty: true
+    depends_on:
+      - db
+      - vector-store
+    env_file:
+      - dev.env
+
+  vector-store:
+    image: qdrant/qdrant:v1.6.1
+    restart: on-failure:2
+    volumes:
+      - ./qdrant/storage:/qdrant/storage
+      - ./qdrant/snapshots:/qdrant/snapshots
+    networks:
+      - kada-gpt
+
+  db:
+    image: mariadb:10.11.6-jammy  # ltsを選択
+    restart: on-failure:2  # エラー時に再起動(2回まで)
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'  # rootアカウントをパスワードなしで作成
+      MYSQL_DATABASE: 'api'
+      TZ: 'Asia/Tokyo'  # タイムゾーンを日本時間に設定
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci  # 文字コードを指定
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+    networks:
+      - kada-gpt
+
+volumes:
+  api-venv:
+  api-vscode:
+  api-mypy-cache:
+
+networks:
+  kada-gpt:
+    name: kada-gpt
+    driver: bridge

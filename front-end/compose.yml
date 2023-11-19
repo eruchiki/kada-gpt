@@ -1,0 +1,22 @@
+# services:
+#   streamlit:
+#     build:
+#       context: ./fastapi/
+#       dockerfile: Dockerfile
+#     restart: always
+#     volumes:
+#       - ./streamlit/app:/src
+#     networks:
+#       - kada-gpt-front
+#     env_file:
+#       - .env
+#     logging:
+#       driver: json-file
+#       options:
+#         max-size: 100m
+#         max-file: '10'
+
+# networks:
+#   kada-gpt-front:
+#     name: kada-gpt-front
+#     driver: bridge
