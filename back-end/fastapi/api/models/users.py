@@ -8,7 +8,7 @@ class Users(Base):
 
     id = Column(Integer, primary_key=True)
     group_id = Column(Integer, ForeignKey("groups.id"))
-    email = Column(String(100))
+    email = Column(String(500))
     name = Column(String(1024))
     password = Column(String(1024))
     admin = Column(Boolean, default=False)
@@ -18,7 +18,7 @@ class Users(Base):
     update_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    exsited = Column(Boolean, default=True)
+    publish = Column(Boolean, default=True)
 
 
 class Groups(Base):
@@ -32,4 +32,4 @@ class Groups(Base):
     update_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    exsited = Column(Boolean, default=True)
+    publish = Column(Boolean, default=True)

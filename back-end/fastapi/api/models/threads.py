@@ -19,7 +19,7 @@ class Threads(Base):
     update_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    exsited = Column(Boolean, default=True)
+    publish = Column(Boolean, default=True)
 
 
 class Chat(Base):
@@ -27,14 +27,15 @@ class Chat(Base):
 
     id = Column(Integer, primary_key=True)
     thred_id = Column(Integer, ForeignKey("threads.id"))
-    text = Column(String(100))
+    message_id = Column(Integer)
+    response_id = Column(Integer)
     created_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
     update_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    exsited = Column(Boolean, default=True)
+    publish = Column(Boolean, default=True)
 
 
 class Collections(Base):
@@ -49,7 +50,7 @@ class Collections(Base):
     update_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    exsited = Column(Boolean, default=True)
+    publish = Column(Boolean, default=True)
 
 
 class Documents(Base):
@@ -62,4 +63,4 @@ class Documents(Base):
     created_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    exsited = Column(Boolean, default=True)
+    publish = Column(Boolean, default=True)

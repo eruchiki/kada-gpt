@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from datetime import datetime
 
 
 class BaseUser(BaseModel):
@@ -14,13 +15,20 @@ class CreateUser(BaseUser):
         orm_mode = True
 
 
-class ResponseCreateUser(CreateUser):
+class ResponseUser(BaseUser):
     id: int
+    group_id: int
+    password: str
+    create_time: datetime
+    update_time: datetime
+    admin: bool
+    publish: bool
 
 
 class UserInfo(BaseUser):
     id: int
 
 
-class DeleteUser(UserInfo):
-    admin: bool
+class UpdateUser(CreateUser):
+    id: int
+    group_id: int
