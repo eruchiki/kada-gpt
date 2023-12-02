@@ -1,16 +1,17 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-import api.models.users as user_model
+import api.models.model as model
 import api.schemas.users as user_schema
 from sqlalchemy import select
 from typing import Tuple, Optional, List
-from sqlalchemy.engine import Result, Row
+from datetime import datetime
+from sqlalchemy.engine import Result
 
 
 # ユーザ作成
 async def create_user(
     db: AsyncSession, user_create: user_schema.CreateUser
-) -> user_model.Users:
-    user = user_model.Users(**user_create.dict())
+) -> model.Users:
+    user = model.Users(**user_create.dict())
     db.add(user)
     await db.commit()
     await db.refresh(user)
@@ -20,67 +21,79 @@ async def create_user(
 # 全ユーザ取得
 async def get_all_user(
     db: AsyncSession,
-) -> Optional[List[Tuple[user_schema.UserInfo]]]:
-    result: Result[Tuple[user_schema.UserInfo]] = await db.execute(
+) -> Optional[List[Tuple[int, int, str, str, str, datetime, datetime, bool]]]:
+    result: Result = await db.execute(
         select(
-            user_model.Users.id,
-            user_model.Users.name,
-            user_model.Users.email,
-            user_model.Groups.name,
-        ).outerjoin(user_model.Groups)
+            model.Users.id,
+            model.Users.group_id,
+            model.Users.name,
+            model.Groups.name.label("group_name"),
+            model.Users.email,
+            model.Users.created_at,
+            model.Users.update_at,
+            model.Users.admin,
+        )
+        .outerjoin(model.Groups)
+        .filter(model.Users.publish)
     )
     return result.all()
 
 
 # 特定のユーザ取得
-async def get_user(
-    db: AsyncSession, user_id: int
-) -> Optional[user_schema.ResponseUser]:
-    result: Result[Tuple[user_schema.ResponseUser]] = await db.execute(
-        select(
-            user_model.Users.id,
-            user_model.Users.group_id,
-            user_model.Users.name,
-            user_model.Users.email,
-            user_model.Users.created_at,
-            user_model.Users.update_at,
-            user_model.Users.admin,
-            user_model.Groups.name,
+async def get_user(db: AsyncSession, user_id: int) -> Optional[model.Users]:
+    result: Result = await db.execute(
+        select(model.Users).filter(
+            model.Users.id == user_id, model.Users.publish
         )
-        .outerjoin(user_model.Groups)
-        .filter(user_model.Users.id == user_id)
     )
-    user_data: Optional[Row[Tuple[user_schema.ResponseUser]]] = result.first()
-    return user_data[0]
+    user_data = result.first()
+    return user_data[0] if user_data is not None else None
+
+
+# 特定のユーザ取得
+async def get_user_and_group_name(
+    db: AsyncSession, user_id: int
+) -> Tuple[int, int, str, str, str, str, datetime, datetime, bool]:
+    result: Result = await db.execute(
+        select(
+            model.Users.id,
+            model.Users.group_id,
+            model.Users.name,
+            model.Users.password,
+            model.Groups.name.label("group_name"),
+            model.Users.email,
+            model.Users.created_at,
+            model.Users.update_at,
+            model.Users.admin,
+        )
+        .filter(model.Users.id == user_id, model.Users.publish == True)
+        .outerjoin(model.Groups)
+    )
+    user_data = result.first()
+    return user_data if user_data is not None else None
 
 
 # ユーザ情報更新
 async def update_user(
-    db: AsyncSession, user_id: int, update_data: user_schema.UpdateUser
-) -> Optional[user_schema.ResponseUser]:
-    before_data = await get_user(db, user_id)
-    if before_data is not None:
-        before_data.name = update_data.name
-        before_data.password = update_data.password
-        before_data.group_id = update_data.group_id
-        before_data.email = update_data.email
-    else:
-        return None
+    db: AsyncSession,
+    update_data: user_schema.UpdateUser,
+    original: model.Users,
+) -> model.Users:
+    original.name = update_data.name
+    original.password = update_data.password
+    original.group_id = update_data.group_id
+    original.email = update_data.email
     await db.commit()
-    await db.refresh(before_data)
-    return before_data
+    await db.refresh(original)
+    return original
 
 
 # ユーザ削除
 async def delete_user(
     db: AsyncSession,
-    user_id: int,
-) -> Optional[user_schema.ResponseUser]:
-    update_data = await get_user(db, user_id)
-    if update_data is not None:
-        update_data.publish = False
-    else:
-        return None
+    original: model.Users,
+) -> Optional[model.Users]:
+    original.publish = False
     await db.commit()
-    await db.refresh(update_data)
-    return update_data
+    await db.refresh(original)
+    return original
