@@ -102,7 +102,6 @@ class Collections(Base):
     id = Column(Integer, primary_key=True)
     create_user_id = Column(Integer, ForeignKey("users.id"))
     name = Column(String(1024))
-    hash = Column(Text)
     created_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

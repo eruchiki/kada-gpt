@@ -11,7 +11,7 @@ from sqlalchemy.engine import Result
 async def create_group(
     db: AsyncSession, group_create: group_schema.CreateGroup
 ) -> model.Groups:
-    group = model.Groups(**group_create.dict())
+    group = model.Groups(**group_create.model_dump())
     db.add(group)
     await db.commit()
     await db.refresh(group)

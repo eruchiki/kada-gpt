@@ -26,8 +26,20 @@ async def create_group(
     return await cruds.create_group(db, group_body)
 
 
+# グループ取得
+@router.get("/chat/groups/{group_id}", response_model=schema.ResponseGroup)
+async def get_group(
+    group_id: int,
+    db: AsyncSession = Depends(get_db),
+) -> schema.ResponseGroup:
+    group_data = await cruds.get_group(db, group_id)
+    if group_data is None:
+        raise HTTPException(status_code=404, detail=f"{group_id} not Found")
+    return group_data
+
+
 # グループ更新
-@router.patch("/chat/group/{group_id}", response_model=schema.ResponseGroup)
+@router.patch("/chat/groups/{group_id}", response_model=schema.ResponseGroup)
 async def update_group(
     group_id: int,
     group_body: schema.UpdateGroup,
@@ -41,7 +53,7 @@ async def update_group(
 
 
 # グループ削除
-@router.delete("/chat/group/{group_id}", response_model=schema.ResponseGroup)
+@router.delete("/chat/groups/{group_id}", response_model=schema.ResponseGroup)
 async def delete_group(
     group_id: int, db: AsyncSession = Depends(get_db)
 ) -> schema.ResponseGroup:

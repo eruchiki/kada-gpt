@@ -1,13 +1,13 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 
 
 class ThreadBase(BaseModel):
-    name: str = Field(None, example="テスト")
-    model_name: str = Field(None, example="gpt4")
+    name: str = Field(None, json_schema_extra={"example": "テスト"})
+    model_name: str = Field(None, json_schema_extra={"example": "gpt4"})
     relate_num: int
     collection_id: int
-    search_method: str = Field(None, example="従来手法")
+    search_method: str = Field(None, json_schema_extra={"example": "従来手法"})
 
 
 class CreateThread(ThreadBase):
@@ -24,9 +24,7 @@ class ResponseThread(ThreadBase):
     group_id: int
     created_at: datetime
     update_at: datetime
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class DisplayResponseThread(ResponseThread):
@@ -43,9 +41,7 @@ class DeleteResponseThread(ResponseThread):
 
 class CreateResponseThread(CreateThread):
     id: int
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class MessageBase(BaseModel):
@@ -63,9 +59,7 @@ class SendMessage(MessageBase):
 
 class ResponseMessage(MessageBase):
     id: int
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class DesplayResponseMessage(ResponseMessage):

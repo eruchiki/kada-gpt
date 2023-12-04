@@ -1,11 +1,13 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 from typing import Optional
 
 
 class BaseUser(BaseModel):
-    name: Optional[str] = Field(None, example="テスト")
-    email: Optional[str] = Field(None, example="hoge@kagawa-u.ac.jp")
+    name: Optional[str] = Field(None, json_schema_extra={"example": "テスト"})
+    email: Optional[str] = Field(
+        None, json_schema_extra={"example": "hogefuga@kagawa-u.ac.jp"}
+    )
 
 
 class CreateUser(BaseUser):
@@ -15,9 +17,7 @@ class CreateUser(BaseUser):
 
 class CreateResponseUser(CreateUser):
     id: int
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UpdateUser(BaseUser):
@@ -31,9 +31,7 @@ class ResponseUser(BaseUser):
     created_at: datetime
     update_at: datetime
     admin: bool
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class DisplayResponseUser(ResponseUser):

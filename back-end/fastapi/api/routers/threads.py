@@ -21,7 +21,8 @@ async def create_thread(
 
 # スレッド一覧取得
 @router.get(
-    "/chat/users/{user_id}/thread", response_model=List[schema.DisplayThread]
+    "/chat/users/{user_id}/thread",
+    response_model=List[schema.DisplayResponseThread],
 )
 async def add_user(
     db: AsyncSession = Depends(get_db),
@@ -32,11 +33,11 @@ async def add_user(
 # スレッド削除
 @router.delete(
     "/chat/users/{user_id}/thread/{thread_id}",
-    response_model=schema.ThreadInfo,
+    response_model=schema.DeleteResponseThread,
 )
 async def delate_thread(
     thread_id: int, db: AsyncSession = Depends(get_db)
-) -> schema.ThreadInfo:
+) -> schema.DeleteResponseThread:
     before_data = await cruds.get_thread(db, thread_id)
     if before_data is None:
         raise HTTPException(status_code=404, detail=f"{thread_id} not Found")

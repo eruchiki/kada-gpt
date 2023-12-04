@@ -43,14 +43,14 @@ async def get_all_thread(
 # 特定のスレッド取得
 async def get_thread(
     db: AsyncSession, thread_id: int
-) -> Optional[thread_schema.ThreadInfo]:
-    result: Result[Tuple[thread_schema.ThreadInfo]] = await db.execute(
+) -> Optional[thread_schema.ResponseThread]:
+    result: Result[Tuple[thread_schema.ResponseThread]] = await db.execute(
         select(model.Threads)
         .outerjoin(model.Collections)
         .filter(model.Threads.id == thread_id)
     )
     thread_data: Optional[
-        Row[Tuple[thread_schema.ThreadInfo]]
+        Row[Tuple[thread_schema.ResponseThread]]
     ] = result.first()
     return thread_data[0] if thread_data is not None else None
 
@@ -76,7 +76,7 @@ async def delete_thread(
     db: AsyncSession,
     user_id: int,
     original: model.Threads,
-) -> Optional[thread_schema.ThreadInfo]:
+) -> Optional[thread_schema.ResponseThread]:
     update_data = await get_thread(db, user_id)
     if update_data is not None:
         original.publish = False
