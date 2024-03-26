@@ -106,7 +106,7 @@ async def generate_concurrently(
     query: str,
     prompt: PromptTemplate,
     model: str = "gpt-3.5-turbo",
-) -> list:
+) -> Any:
     # モデル定義
     llm = ChatOpenAI(temperature=0, model=model, timeout=12)
     # プロンプト設定

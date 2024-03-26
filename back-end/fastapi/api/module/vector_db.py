@@ -1,11 +1,11 @@
 from langchain.schema import Document
-from qdrant_client.http.models import Filter, FieldCondition, MatchValue
-from typing import Optional
 from langchain.vectorstores import Qdrant
 from qdrant_client import QdrantClient
 from langchain.embeddings import OpenAIEmbeddings
 from qdrant_client.models import Distance, VectorParams
-from langchain.callbacks import get_openai_callback
+from api.module.preprocessing import morpheme
+from langchain.retrievers import BM25Retriever
+from typing import Any
 
 
 def text_to_documents(text_list: list, metadata: dict) -> list:
@@ -41,10 +41,31 @@ def load_qdrant(
 def insert_data(
     documents: str, embeddings: Any, host: str, port: int, collection_name: str
 ) -> None:
-    qdrant = Qdrant.from_documents(
+    Qdrant.from_documents(
         documents,
         embeddings,
         host=host,
         port=port,
         collection_name=collection_name,
     )
+
+
+def bm25_search(collection_name: str, client: QdrantClient) -> BM25Retriever:
+    count = client.count(collection_name).count
+    record_list = client.scroll(
+        collection_name, limit=count, with_vectors=True
+    )[0]
+    corpus = [
+        record.payload["page_content"]
+        for record in record_list
+        if record.payload is not None and "page_content" in record.payload
+    ]
+
+    def preprocess_func(text: str) -> list[str]:
+        _, text_list = morpheme(text, neologd=True)
+        return text_list
+
+    retriever = BM25Retriever.from_texts(
+        corpus, preprocess_func=preprocess_func
+    )
+    return retriever

@@ -1,10 +1,6 @@
-from langchain.schema import Document
 from typing import Optional
 from langchain.vectorstores import Qdrant
-from api.module.preprocessing import chunk_split
-
-NEOLOGD_PATH = "/usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd"
-MECABRC_PATH = "/etc/mecabrc"
+from langchain.retrievers import BM25Retriever
 
 
 def documents_search(
@@ -23,20 +19,6 @@ def documents_search(
     return related_data, score_data
 
 
-def detail_search(related_data: list) -> list:
-    for relate in related_data:
-        group = []
-        related_info = []
-        split_text = chunk_split(relate.page_content)
-        for i, text in enumerate(split_text):
-            info = Document(
-                page_content=text,
-                metadata={
-                    "filename": relate.metadata["filename"],
-                    "rank": relate.metadata["rank"],
-                    "item_number": i,
-                },
-            )
-            group.append(info)
-        related_info.append([group])
-    return related_info
+def bm25_search(query: str, retriever: BM25Retriever) -> list:
+    related_data = retriever.get_relevant_documents(query)
+    return related_data

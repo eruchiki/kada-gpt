@@ -1,12 +1,34 @@
 from langchain.chat_models import ChatOpenAI
 from api.module.answer_prompt import related_prompt, create_system_prompt
 from langchain import LLMChain
+from langchain.schema import Document
+from api.module.preprocessing import chunk_split
 from langchain.callbacks import get_openai_callback
 from langchain.vectorstores import Qdrant
-from module.search import documents_search, detail_search
+from module.search import documents_search
 from module.select import select
 from typing import Optional, Any
 import re
+
+
+# ドキュメントをグルーピング
+def group_sentence(related_data: list) -> list:
+    for relate in related_data:
+        group = []
+        related_info = []
+        split_text = chunk_split(relate.page_content)
+        for i, text in enumerate(split_text):
+            info = Document(
+                page_content=text,
+                metadata={
+                    "filename": relate.metadata["filename"],
+                    "rank": relate.metadata["rank"],
+                    "item_number": i,
+                },
+            )
+            group.append(info)
+        related_info.append([group])
+    return related_info
 
 
 # 回答作成
@@ -59,7 +81,7 @@ def compose(
 
 
 # 回答
-def answer_default(
+def answer(
     query: str,
     model: str,
     db: Qdrant,
@@ -72,7 +94,7 @@ def answer_default(
         related_data, score_data = documents_search(
             db, query, top_k=relate_num, filter=filter
         )
-        related_info = detail_search(related_data)
+        related_info = group_sentence(related_data)
     elif mode == "select":
         related_data, score_data = documents_search(
             db, query, top_k=relate_num, filter=filter

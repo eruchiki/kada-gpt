@@ -2,10 +2,8 @@ import fitz
 from api.module.preprocessing import morpheme
 
 
-def pdf_reader(
-    file_data: Any, table_save: bool = False
-) -> str:
-    doc = fitz.open(stream=file_data.read(), filetype="pdf")
+def pdf_reader(file_data: bytes, table_save: bool = False) -> str:
+    doc = fitz.open(stream=file_data, filetype="pdf")
     text_data = ""
     for page in range(len(doc)):
         page_data = doc[page]
