@@ -1,7 +1,5 @@
 from langchain.schema import Document
 from qdrant_client.http.models import Filter, FieldCondition, MatchValue
-import MeCab
-import pykakasi
 from typing import Optional
 from langchain.vectorstores import Qdrant
 from qdrant_client import QdrantClient
@@ -14,20 +12,6 @@ def text_to_documents(text_list: list, metadata: dict) -> list:
     return [
         Document(page_content=data, metadata=metadata | {"nth": i})
         for i, data in enumerate(text_list)
-    ]
-
-
-def documents_search(
-    db: Any,
-    query: str,
-    top_k: int = 3,
-    filter: Optional[dict] = None,
-    border: float = 0.7,
-) -> tuple[list, list]:
-    docs = db.similarity_search_with_score(query=query, k=top_k, filter=filter)
-    # print([(doc.page_content,score) for doc,score in docs])
-    return [doc for doc, score in docs if score > border], [
-        score for doc, score in docs if score > border
     ]
 
 
@@ -54,7 +38,9 @@ def load_qdrant(
     )
 
 
-def insert_data(documents: str, embeddings: Any, host: str, port: int, collection_name: str) -> :
+def insert_data(
+    documents: str, embeddings: Any, host: str, port: int, collection_name: str
+) -> None:
     qdrant = Qdrant.from_documents(
         documents,
         embeddings,

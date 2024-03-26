@@ -1,5 +1,4 @@
 import fitz
-from unicodedata import normalize
 
 
 def pdf_reader(
@@ -19,14 +18,7 @@ def pdf_reader(
             for tbl in table_data:
                 for t in tbl.extract():
                     if None in t:
-                        t = [_t for _t in t if _t != None]
+                        t = [_t for _t in t if _t is not None]
                     table_text += ":".join(t).replace("\n", "") + "\n"
                 table_text += "\n"
     return text_data
-
-
-def normalize_text(text_data: str, replace_str: str = "\u3000") -> str:
-    clean_text = normalize("NFKC", text_data)
-    clean_text = clean_text.replace(replace_str, " ")
-    clean_text = clean_text.replace("\n", "")
-    return clean_text
