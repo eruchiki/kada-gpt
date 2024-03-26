@@ -1,5 +1,11 @@
 from unicodedata import normalize
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+import MeCab
+import pykakasi
+
+
+NEOLOGD_PATH = "/usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd"
+MECABRC_PATH = "/etc/mecabrc"
 
 
 def normalize_text(text_data: str, replace_str: str = "\u3000") -> str:
@@ -21,3 +27,58 @@ def chunk_split(text_data: str, chunk_num: int = 6) -> list[str]:
         split_text[i - 1] += split_text[i][0]
         split_text[i] = split_text[i][1:]
     return split_text
+
+
+def morpheme(
+    sentence: str, neologd: bool = False
+) -> tuple[dict, list]:
+    if neologd:
+        wakati = MeCab.Tagger(NEOLOGD_PATH)
+    else:
+        wakati = MeCab.Tagger("-Owakati")
+    kks = pykakasi.kakasi()
+    morpheme_list = []
+    morpheme_dict: dict = {}
+    node = wakati.parseToNode(sentence)
+    while node:
+        word = node.surface
+        if word != "":
+            morpheme_list.append(word)
+        kind_dict: dict = {}
+        node_list = node.feature.split(",")
+        if neologd:
+            if node_list[1] == "数詞":
+                kind_dict = {
+                    "speech": node_list[0],
+                    "detail_speech": node_list[1],
+                }
+            else:
+                reading = kks.convert(node_list[-2])
+                kind_dict = {
+                    "speech": node_list[0],
+                    "detail_speech": node_list[1:4],
+                    "endform": node_list[-3],
+                    "reading": reading[0]["hira"],
+                }
+                if len(node_list) > 5:
+                    kind_dict["endform"] = node_list[-3]
+                    kind_dict["reading"] = reading[0]["hira"]
+        else:
+            kind_dict = {
+                "speech": node_list[0],
+                "detail_speech": node_list[1:4],
+            }
+            if len(node_list) > 7:
+                kind_dict["inflect"] = node_list[5]
+                kind_dict["endform"] = node_list[7]
+                reading = kks.convert(node_list[-1])
+                kind_dict["reading"] = reading[0]["hira"]
+            else:
+                kind_dict["inflect"] = "*"
+                kind_dict["endform"] = "*"
+                reading = kks.convert(node_list[-1])
+                kind_dict["reading"] = reading[0]["hira"]
+        if word not in morpheme_dict.keys():
+            morpheme_dict[word] = kind_dict
+        node = node.next
+    return morpheme_dict, morpheme_list

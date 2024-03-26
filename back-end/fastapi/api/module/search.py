@@ -1,6 +1,4 @@
 from langchain.schema import Document
-import MeCab
-import pykakasi
 from typing import Optional
 from langchain.vectorstores import Qdrant
 from api.module.preprocessing import chunk_split
@@ -42,34 +40,3 @@ def detail_search(related_data: list) -> list:
             group.append(info)
         related_info.append([group])
     return related_info
-
-
-def morpheme(sentence: str) -> tuple[dict, list]:
-    wakati = MeCab.Tagger(f"-Owakati -d {NEOLOGD_PATH} -r {MECABRC_PATH}")
-    morpheme_list = []
-    morpheme_dict: dict = {}
-    kks = pykakasi.kakasi()
-    node = wakati.parseToNode(sentence)
-    while node:
-        word = node.surface
-        if word != "":
-            morpheme_list.append(word)
-        kind_dict = {}
-        node_list = node.feature.split(",")
-        if node_list[1] == "数詞":
-            kind_dict = {"speech": node_list[0], "detail_speech": node_list[1]}
-        else:
-            reading = kks.convert(node_list[-2])
-            kind_dict = {
-                "speech": node_list[0],
-                "detail_speech": node_list[1:4],
-                "endform": node_list[-3],
-                "reading": reading[0]["hira"],
-            }
-            if len(node_list) > 5:
-                kind_dict["endform"] = node_list[-3]
-                kind_dict["reading"] = reading[0]["hira"]
-        if word not in morpheme_dict.keys():
-            morpheme_dict[word] = kind_dict
-        node = node.next
-    return morpheme_dict, morpheme_list
