@@ -82,3 +82,19 @@ cd api/
 python migrate_db.py 
 mysql
 python /src/.vscode-server/extensions/ms-python.python-2024.2.1/pythonFiles/printEnvVariablesToFile.py /src/.vscode-server/extensions/ms-python.python-2024.2.1/pythonFiles/deactivate/bash/envVars.txt
+pip install gensim
+pip install gensim=3.8.3
+pip install gensim==3.8.3
+pip install --upgrade --quiet  rank_bm25
+python
+python /src/.vscode-server/extensions/ms-python.python-2024.2.1/pythonFiles/printEnvVariablesToFile.py /src/.vscode-server/extensions/ms-python.python-2024.2.1/pythonFiles/deactivate/bash/envVars.txt
+python /src/.vscode-server/extensions/ms-python.python-2024.2.1/pythonFiles/printEnvVariablesToFile.py /src/.vscode-server/extensions/ms-python.python-2024.2.1/pythonFiles/deactivate/bash/envVars.txt
+pip install MeCab
+pip install mecab-python3
+python
+cd /usr/lib
+ls
+cd x86_64-linux-gnu/
+ls
+cd mecab
+python /src/.vscode-server/extensions/ms-python.python-2024.2.1/pythonFiles/printEnvVariablesToFile.py /src/.vscode-server/extensions/ms-python.python-2024.2.1/pythonFiles/deactivate/bash/envVars.txt

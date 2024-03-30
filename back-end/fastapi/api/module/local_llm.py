@@ -1,0 +1,1 @@
+from langchain.llms.huggingface_pipeline import HuggingFacePipeline
