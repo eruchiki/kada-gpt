@@ -14,6 +14,23 @@ docker compose -f compose.dev.yml run --rm --entrypoint "poetry add --group docu
 docker compose -f compose.dev.yml run --rm --entrypoint "poetry add --group database sqlalchemy aiomysql" api
 ```
 
+## pyproject.toml更新例
+`docker compose run --rm --entrypoint <コマンド> <コンテナ名>`でコンテナを一時的に作成し，その中でコマンドを実行させている．
+`-f compose.dev.yml`はcomposeファイルを指定しているだけ．
+つまり以下のコマンドでは，`compose.dev.yml`にある`api`コンテナを起動し，`poetry ~`を実行した後，コンテナは終了する．
+```bash
+docker compose -f compose.dev.yml run --rm --entrypoint "poetry add --group llm mecab-python3" api
+# 以下は無くてもいけるかもしれない
+docker compose -f compose.dev.yml run --rm --entrypoint "poetry lock --no-update" api
+docker compose -f compose.dev.yml run --rm --entrypoint "poetry install" api
+```
+
+## pyproject.toml更新例2
+他人が更新したファイルは以下のコマンドで自分の環境に適用
+```bash
+docker compose -f compose.dev.yml run --rm --entrypoint "poetry install" api
+```
+
 ## 初回起動(VSCode)
 ### 前提条件
 VSCode及びDocker(Docker Desktop)が導入済みかつ，VSCodeの拡張機能のRemote Developmentがインストールされていること
