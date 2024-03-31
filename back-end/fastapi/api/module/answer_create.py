@@ -5,8 +5,8 @@ from langchain.schema import Document
 from api.module.preprocessing import chunk_split
 from langchain.callbacks import get_openai_callback
 from langchain.vectorstores import Qdrant
-from module.search import documents_search
-from module.select import select
+from api.module.document_search import documents_search
+from api.module.related_select import select
 from typing import Optional, Any
 import re
 
@@ -83,13 +83,13 @@ def compose(
 # 回答
 def answer(
     query: str,
-    model: str,
+    llm: Any,
     db: Qdrant,
     mode: str = "default",
     relate_num: int = 4,
     filter: Optional[dict] = None,
 ) -> dict:
-    llm = ChatOpenAI(temperature=0, model=model, timeout=300)
+    # llm = ChatOpenAI(temperature=0, model=model, timeout=300)
     if mode == "default":
         related_data, score_data = documents_search(
             db, query, top_k=relate_num, filter=filter
