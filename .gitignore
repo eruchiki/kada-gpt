@@ -12,6 +12,8 @@ venv.bak/
 .vscode-server/
 .mypy_cache/
 .cache/
+.dotnet/
+.bash_history
 log/
 back-end/mysql/data/
 back-end/qdrant/

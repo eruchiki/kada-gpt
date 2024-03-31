@@ -98,3 +98,5 @@ cd x86_64-linux-gnu/
 ls
 cd mecab
 python /src/.vscode-server/extensions/ms-python.python-2024.2.1/pythonFiles/printEnvVariablesToFile.py /src/.vscode-server/extensions/ms-python.python-2024.2.1/pythonFiles/deactivate/bash/envVars.txt
+python /src/.vscode-server/extensions/ms-python.python-2024.2.1/pythonFiles/printEnvVariablesToFile.py /src/.vscode-server/extensions/ms-python.python-2024.2.1/pythonFiles/deactivate/bash/envVars.txt
+python /src/.vscode-server/extensions/ms-python.python-2024.2.1/pythonFiles/printEnvVariablesToFile.py /src/.vscode-server/extensions/ms-python.python-2024.2.1/pythonFiles/deactivate/bash/envVars.txt
