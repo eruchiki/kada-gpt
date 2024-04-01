@@ -21,7 +21,9 @@ async def create_user(
 # 全ユーザ取得
 async def get_all_user(
     db: AsyncSession,
-) -> Optional[List[Tuple[int, int, str, str, str, datetime, datetime, bool]]]:
+) -> Optional[
+    List[Tuple[int, int, str, str, str, datetime, datetime, bool]]
+]:
     result: Result = await db.execute(
         select(
             model.Users.id,
@@ -31,7 +33,7 @@ async def get_all_user(
             model.Users.email,
             model.Users.created_at,
             model.Users.update_at,
-            model.Users.admin,
+            model.Users.is_admin,
         )
         .outerjoin(model.Groups)
         .filter(model.Users.publish)
@@ -64,7 +66,7 @@ async def get_user_and_group_name(
             model.Users.email,
             model.Users.created_at,
             model.Users.update_at,
-            model.Users.admin,
+            model.Users.is_admin,
         )
         .filter(model.Users.id == user_id, model.Users.publish)
         .outerjoin(model.Groups)
@@ -92,7 +94,7 @@ async def delete_user(
     db: AsyncSession,
     original: model.Users,
 ) -> Optional[model.Users]:
-    original.publish = False
+    not original.publish
     await db.commit()
     await db.refresh(original)
     return original

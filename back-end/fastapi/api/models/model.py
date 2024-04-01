@@ -21,7 +21,7 @@ class Users(Base):
     email = Column(String(500))
     name = Column(String(1024))
     password = Column(String(1024))
-    admin = Column(Boolean, default=False)
+    is_admin = Column(Boolean, default=False)
     created_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

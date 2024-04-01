@@ -16,7 +16,7 @@ def text_to_documents(text_list: list, metadata: dict) -> list:
 
 
 def load_qdrant(
-    collection_name: str, host: str = "qdrant", port: int = 6333
+    collection_name: str, host: str = "vector-store", port: int = 6333
 ) -> Qdrant:
     client = QdrantClient(host=host, port=port)
 

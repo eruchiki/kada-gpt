@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from typing import List
+from typing import List, Optional
 from api.db import get_db
 import api.schemas.threads as schema
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,9 +24,9 @@ async def create_thread(
     "/chat/users/{user_id}/thread",
     response_model=List[schema.DisplayResponseThread],
 )
-async def add_user(
+async def get_thread_all(
     db: AsyncSession = Depends(get_db),
-) -> schema.ResponseMessage:
+) -> schema.DisplayResponseThread:
     return await cruds.get_all_thread(db)
 
 
@@ -37,21 +37,22 @@ async def add_user(
 )
 async def delate_thread(
     thread_id: int, db: AsyncSession = Depends(get_db)
-) -> schema.DeleteResponseThread:
+) -> Optional[schema.DeleteResponseThread]:
     before_data = await cruds.get_thread(db, thread_id)
     if before_data is None:
         raise HTTPException(status_code=404, detail=f"{thread_id} not Found")
-    user_info = await cruds.delete_thread(db, original=before_data)
-    return user_info
+    thread_info = await cruds.delete_thread(db, thread_id, original=before_data)
+    return thread_info
 
 
 # スレッド内のチャット履歴取得
-@router.get("/chat/users/{user_id}/thread/{thread_id}")
+@router.get("/chat/users/{user_id}/thread/{thread_id}",
+            response_model=schema.DeleteResponseThread)
 async def get_thraed_chat() -> dict:
     return {}
 
 
-# チャット送信
+# チャット送受信
 @router.post("/chat/users/{user_id}/thread/{thread_id}")
 async def get_user_info() -> dict:
     return {}
