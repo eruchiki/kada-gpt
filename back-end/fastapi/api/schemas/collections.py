@@ -20,8 +20,16 @@ class ResponseCollectionBase(CollectionBase):
     id: int
     created_at: datetime
     update_at: datetime
-    publish: bool
 
 
 class DelateResponseCollection(ResponseCollectionBase):
     pass
+
+
+class AddDocument(BaseModel):
+    create_user_id: int
+
+
+class AddResponseDocument(BaseModel):
+    id: int
+    model_config = ConfigDict(from_attributes=True)

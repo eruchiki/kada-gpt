@@ -21,7 +21,7 @@ class Users(Base):
     email = Column(String(500))
     name = Column(String(1024))
     password = Column(String(1024))
-    admin = Column(Boolean, default=False)
+    is_admin = Column(Boolean, default=False)
     created_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
@@ -121,7 +121,6 @@ class Documents(Base):
     collection_id = Column(Integer, ForeignKey("collections.id"))
     create_user_id = Column(Integer, ForeignKey("users.id"))
     uri = Column(String(1000))
-    hash = Column(Text)
     created_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

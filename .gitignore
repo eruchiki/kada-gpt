@@ -14,6 +14,7 @@ venv.bak/
 .cache/
 .dotnet/
 .bash_history
+pdf_files/
 log/
 back-end/mysql/data/
 back-end/qdrant/

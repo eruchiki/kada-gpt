@@ -52,6 +52,9 @@ async def get_thraed_chat() -> dict:
 
 
 # チャット送信
-@router.post("/chat/users/{user_id}/thread/{thread_id}")
-async def get_user_info() -> dict:
+@router.post(
+    "/chat/users/{user_id}/thread/{thread_id}",
+    response_model=schema.ResponseMessage,
+)
+async def post_thread_chat(thread_body: schema.SendMessage) -> dict:
     return {}

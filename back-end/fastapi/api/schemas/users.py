@@ -30,7 +30,7 @@ class ResponseUser(BaseUser):
     group_id: int
     created_at: datetime
     update_at: datetime
-    admin: bool
+    is_admin: bool
     model_config = ConfigDict(from_attributes=True)
 
 

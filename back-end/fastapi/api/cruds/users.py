@@ -31,7 +31,7 @@ async def get_all_user(
             model.Users.email,
             model.Users.created_at,
             model.Users.update_at,
-            model.Users.admin,
+            model.Users.is_admin,
         )
         .outerjoin(model.Groups)
         .filter(model.Users.publish)
@@ -64,7 +64,7 @@ async def get_user_and_group_name(
             model.Users.email,
             model.Users.created_at,
             model.Users.update_at,
-            model.Users.admin,
+            model.Users.is_admin,
         )
         .filter(model.Users.id == user_id, model.Users.publish == True)
         .outerjoin(model.Groups)
