@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
+from typing import Optional
 
 
 class ThreadBase(BaseModel):
@@ -44,22 +45,25 @@ class CreateResponseThread(CreateThread):
     model_config = ConfigDict(from_attributes=True)
 
 
-class MessageBase(BaseModel):
-    message_text: str
-    response_text: str
+# class MessageBase(BaseModel):
+#     message_text: str
+#     response_text: str
 
 
-class SendMessage(MessageBase):
+class SendMessage(BaseModel):
+    user_id: int
     thead_id: int
-    collection_name: str
-    relate_num: int
-    search_method: str
-    model_name: str
+    collection_name: Optional[str] = Field(None, description="コレクション名を指定")
+    relate_num: Optional[int] = Field(None, example=5)
+    search_method: Optional[str] = Field(None, description="検索手法を指定")
+    model_name: Optional[str] = Field(None, description="モデル名を指定")
+    message_text: str = Field(None, description="メッセージ")
 
 
-class ResponseMessage(MessageBase):
+class ResponseMessage(BaseModel):
     id: int
     model_config = ConfigDict(from_attributes=True)
+    response_text: str
 
 
 class DesplayResponseMessage(ResponseMessage):

@@ -121,7 +121,6 @@ class Documents(Base):
     collection_id = Column(Integer, ForeignKey("collections.id"))
     create_user_id = Column(Integer, ForeignKey("users.id"))
     uri = Column(String(1000))
-    hash = Column(Text)
     created_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
