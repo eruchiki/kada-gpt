@@ -11,7 +11,7 @@ from sqlalchemy.engine import Result
 async def create_user(
     db: AsyncSession, user_create: user_schema.CreateUser
 ) -> model.Users:
-    user = model.Users(**user_create.dict())
+    user = model.Users(**user_create.model_dump())
     db.add(user)
     await db.commit()
     await db.refresh(user)
@@ -21,7 +21,9 @@ async def create_user(
 # 全ユーザ取得
 async def get_all_user(
     db: AsyncSession,
-) -> Optional[List[Tuple[int, int, str, str, str, datetime, datetime, bool]]]:
+) -> Optional[
+    List[Tuple[int, int, str, str, str, datetime, datetime, bool]]
+]:
     result: Result = await db.execute(
         select(
             model.Users.id,
@@ -66,7 +68,7 @@ async def get_user_and_group_name(
             model.Users.update_at,
             model.Users.is_admin,
         )
-        .filter(model.Users.id == user_id, model.Users.publish == True)
+        .filter(model.Users.id == user_id, model.Users.publish)
         .outerjoin(model.Groups)
     )
     user_data = result.first()
@@ -81,7 +83,6 @@ async def update_user(
 ) -> model.Users:
     original.name = update_data.name
     original.password = update_data.password
-    original.group_id = update_data.group_id
     original.email = update_data.email
     await db.commit()
     await db.refresh(original)
@@ -93,7 +94,7 @@ async def delete_user(
     db: AsyncSession,
     original: model.Users,
 ) -> Optional[model.Users]:
-    original.publish = False
+    not original.publish
     await db.commit()
     await db.refresh(original)
     return original

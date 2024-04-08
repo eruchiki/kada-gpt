@@ -20,6 +20,7 @@ async def create_thread(
 # 全スレッド取得
 async def get_all_thread(
     db: AsyncSession,
+    user_id: int,
 ) -> Optional[List[thread_schema.DisplayResponseThread]]:
     result: Result[
         Tuple[thread_schema.DisplayResponseThread]
@@ -35,7 +36,7 @@ async def get_all_thread(
             model.Collections.name.label("collection_name"),
         )
         .outerjoin(model.Collections)
-        .filter(model.Threads.publish)
+        .filter(model.Threads.publish, model.Threads.create_user_id == user_id)
     )
     return result.all()
 
@@ -74,10 +75,10 @@ async def update_thread(
 # スレッド削除
 async def delete_thread(
     db: AsyncSession,
-    user_id: int,
+    thread_id: int,
     original: model.Threads,
-) -> Optional[thread_schema.ResponseThread]:
-    update_data = await get_thread(db, user_id)
+) -> Optional[thread_schema.DeleteResponseThread]:
+    update_data = await get_thread(db, thread_id)
     if update_data is not None:
         original.publish = False
     else:
@@ -88,9 +89,35 @@ async def delete_thread(
 
 
 # メッセージ送信
-# async def send_message(
-#     db: AsyncSession,
-#     user_id: int,
-#     original: model.Threads,
-# ):
-# 　履歴取得
+async def send_message(
+    db: AsyncSession, send_chat: thread_schema.SendMessage
+) -> model.Chat:
+    chat = model.Chat(**send_chat.dict())
+    db.add(chat)
+    await db.commit()
+    await db.refresh(chat)
+    return chat
+
+
+# 履歴取得
+async def get_history(
+    db: AsyncSession,
+    thread_id: int
+) -> Optional[List[thread_schema.DesplayResponseMessage]]:
+    result: Result[Tuple[thread_schema.DesplayResponseMessage]] = (
+        await db.execute(
+            select(
+                model.Chat.id,
+                model.Chat.message_text,
+                model.Chat.response_text,
+                model.Chat.relate_number,
+                model.Chat.document_id,
+                model.Chat.create_time,
+                model.Chat.created_at,
+                model.Chat.update_at
+            )
+            .outerjoin(model.Collections)
+            .filter(model.Chat.publish, model.Chat.thread_id == thread_id)
+        )
+    )
+    return result.all()

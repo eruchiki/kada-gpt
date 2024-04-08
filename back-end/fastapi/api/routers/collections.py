@@ -8,6 +8,7 @@ import api.cruds.collection as cruds
 from qdrant_client import QdrantClient
 from fastapi import UploadFile
 
+
 router = APIRouter()
 
 

@@ -28,7 +28,7 @@ async def get_all_group(
             model.Groups.name,
             model.Groups.created_at,
             model.Groups.update_at,
-        ).filter(model.Groups.publish == True)
+        ).filter(model.Groups.publish)
     )
     return result.all()
 
@@ -39,8 +39,7 @@ async def get_group(
 ) -> Optional[model.Groups]:
     result: Result[Tuple[model.Groups]] = await db.execute(
         select(model.Groups).filter(
-            model.Groups.id == group_id, model.Groups.publish == True
-        )
+            model.Groups.id == group_id, model.Groups.publish)
     )
     group_data = result.first()
     return group_data[0] if group_data is not None else None
@@ -63,7 +62,7 @@ async def delete_group(
     db: AsyncSession,
     original: model.Groups,
 ) -> Optional[model.Groups]:
-    original.publish = False
+    not original.publish
     await db.commit()
     await db.refresh(original)
     return original

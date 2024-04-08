@@ -21,7 +21,6 @@ class CreateResponseUser(CreateUser):
 
 
 class UpdateUser(BaseUser):
-    group_id: int
     password: str
 
 
