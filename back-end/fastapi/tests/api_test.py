@@ -74,10 +74,10 @@ async def test_create_and_read(async_client: AsyncClient) -> None:
     response = await async_client.post(
         "/chat/groups", json={"name": "グループ2"}
     )
+    assert response.status_code == starlette.status.HTTP_200_OK
     response_obj = response.json()
     assert response_obj["id"] == 2
     assert response_obj["name"] == "グループ2"
-    assert response.status_code == starlette.status.HTTP_200_OK
     response = await async_client.delete("/chat/groups/2")
     assert response.status_code == starlette.status.HTTP_200_OK
     # 確認
@@ -112,7 +112,7 @@ async def test_create_and_read(async_client: AsyncClient) -> None:
     assert response_obj["password"] == "password"
     assert response_obj["email"] == "hogehoge@gmail.com"
     assert response_obj["group_id"] == 1
-    assert response_obj["admin"] is False
+    assert response_obj["is_admin"] is False
     # 404 test
     response = await async_client.get("/chat/users/2")
     assert response.status_code == starlette.status.HTTP_404_NOT_FOUND
@@ -147,3 +147,70 @@ async def test_create_and_read(async_client: AsyncClient) -> None:
     # 確認
     response = await async_client.get("/chat/users/2")
     assert response.status_code == starlette.status.HTTP_404_NOT_FOUND
+    # collectionに関するテスト
+    # create
+    response = await async_client.post(
+        "/chat/collections", json={"name": "test", "create_user_id": 1}
+    )
+    assert response.status_code == starlette.status.HTTP_200_OK
+    # get
+    # response = await async_client.get("/chat/collections/1?create_user_id=1")
+    # assert response.status_code == starlette.status.HTTP_200_OK
+    # response_obj = response.json()
+    # assert response_obj["id"] == 1
+    # assert response_obj["create_user_id"] == 1
+    # assert response_obj["name"] == "test"
+    # get list
+    response = await async_client.get("/chat/collections")
+    assert response.status_code == starlette.status.HTTP_200_OK
+    response_obj = response.json()
+    assert len(response_obj) == 1
+    # document add
+    fileName1 = "原稿.pdf"
+    fileName2 = "原稿_v3_FIN.pdf"
+
+    fileDataBinary1 = open("/src/tests/原稿.pdf", "rb").read()
+    fileDataBinary2 = open("/src/tests/原稿_v3_FIN.pdf", "rb").read()
+
+    mime_type = "application/pdf"
+    fileList = {
+        "fileList": (fileName1, fileDataBinary1, mime_type),
+        "fileList": (fileName2, fileDataBinary2, mime_type),
+    }
+    response = await async_client.post(
+        "/chat/collections/1?create_user_id=1", files=fileList
+    )
+    assert response.status_code == starlette.status.HTTP_200_OK
+    response_obj = response.json()
+    print(response_obj)
+    assert len(response_obj) == 2
+    assert response_obj[0]["id"] == 1
+    assert response_obj[1]["id"] == 2
+    # threadに関するテスト
+    # create
+    response = await async_client.post(
+        "/chat/users/1/thread",
+        json={"name": "test", "model_name": "gpt4",
+              "relate_num": 4, "collections_id": 1,
+              "search_method": "default", "create_user_id": 1,
+              "group_id": 1}
+    )
+    assert response.status_code == starlette.status.HTTP_200_OK
+    # get
+    # response = await async_client.get("/chat/users/1/thread/1?user_id=1")
+    # assert response.status_code == starlette.status.HTTP_200_OK
+    # response_obj = response.json()
+    # assert response_obj["id"] == 1
+    # assert response_obj["create_user_id"] == 1
+    # assert response_obj["group_id"] == 1
+    # assert response_obj["model_name"] == "gpt4"
+    # assert response_obj["search_method"] == "default"
+    # assert response_obj["name"] == "test"
+    # assert response_obj["collections_id"] == 1
+    # assert response_obj["relate_num"] == 4
+    # assert response.status_code == starlette.status.HTTP_200_OK
+    # get list
+    response = await async_client.get("/chat/users/1/thread")
+    assert response.status_code == starlette.status.HTTP_200_OK
+    response_obj = response.json()
+    assert len(response_obj) == 1

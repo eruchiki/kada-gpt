@@ -1,13 +1,14 @@
 import requests
 
+
 url = "http://localhost:8000/chat/users"
 response = requests.get(url)
 
 print(response.json())
 
 url = "http://localhost:8000/chat/collections/1?create_user_id=1"
-fileName1 = "./tests/fit.pdf"
-fileName2 = "./tests/jasai.pdf"
+fileName1 = "./原稿_v3_FIN.pdf"
+fileName2 = "./原稿4_FIN.pdf"
 
 fileDataBinary1 = open(fileName1, "rb").read()
 fileDataBinary2 = open(fileName2, "rb").read()
