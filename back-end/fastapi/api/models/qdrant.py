@@ -89,17 +89,20 @@ class VectorStore:
         self.collection_path = os.path.join("pdf_files", self.collection_id)
         if not os.path.isdir(self.collection_path):
             os.makedirs(self.collection_path)
-        file_names = [
-            dt.datetime.now().strftime("%Y%m%d%H%M%S%f")
-            + "_"
-            + os.path.splitext(str(file.filename))[0]
-            + str(mimetypes.guess_extension(str(file.filename)))
-            for file in files
-        ]
-        file_paths = [
-            os.path.join(self.collection_path, file_name)
-            for file_name in file_names
-        ]
+        file_paths = []
+        for file in files:
+            non_extension = os.path.splitext(str(file.filename))[0]
+            file_name = os.path.basename(non_extension)
+            extension = os.path.splitext(str(file.filename))[1]
+            if extension == "":
+                extension = ".pdf"
+            guessed_extension = mimetypes.guess_extension(str(file.filename))
+            if guessed_extension is not None:
+                extension = "." + guessed_extension
+            date_string = dt.datetime.now().strftime("%Y%m%d%H%M%S%f")
+            file_name = date_string + "_" + file_name + extension
+            file_path = os.path.join(self.collection_path, file_name)
+            file_paths.append(file_path)
         return file_paths
 
     async def save_pdf(
