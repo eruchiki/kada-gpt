@@ -18,3 +18,4 @@ pdf_files/
 log/
 back-end/mysql/data/
 back-end/qdrant/
+*.pdf
