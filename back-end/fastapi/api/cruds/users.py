@@ -94,7 +94,7 @@ async def delete_user(
     db: AsyncSession,
     original: model.Users,
 ) -> Optional[model.Users]:
-    not original.publish
+    original.publish = False
     await db.commit()
     await db.refresh(original)
     return original

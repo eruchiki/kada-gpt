@@ -8,7 +8,6 @@ from sqlalchemy.engine import Result
 from qdrant_client import QdrantClient
 from datetime import datetime
 from fastapi import UploadFile
-import os
 
 
 # コレクション作成

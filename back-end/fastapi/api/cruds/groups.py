@@ -62,7 +62,7 @@ async def delete_group(
     db: AsyncSession,
     original: model.Groups,
 ) -> Optional[model.Groups]:
-    not original.publish
+    original.publish = False
     await db.commit()
     await db.refresh(original)
     return original

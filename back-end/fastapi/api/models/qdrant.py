@@ -60,7 +60,10 @@ class VectorStore:
                 raise HTTPException(status_code=500, detail=e)
 
     async def insert_documents(
-        self, files: List[UploadFile], file_paths: List[str], ids: List[int],
+        self,
+        files: List[UploadFile],
+        file_paths: List[str],
+        ids: List[int],
     ) -> None:
         self.token_num = 0
         for file, id in zip(files, ids):

@@ -83,13 +83,13 @@ def compose(
 # 回答
 def answer(
     query: str,
-    llm: Any,
+    # llm: Any,
     db: Qdrant,
     mode: str = "default",
     relate_num: int = 4,
     filter: Optional[dict] = None,
 ) -> dict:
-    # llm = ChatOpenAI(temperature=0, model=model, timeout=300)
+    llm = ChatOpenAI(temperature=0, model="gpt4", timeout=300)
     if mode == "default":
         related_data, score_data = documents_search(
             db, query, top_k=relate_num, filter=filter

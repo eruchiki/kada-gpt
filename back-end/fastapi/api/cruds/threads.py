@@ -10,7 +10,7 @@ from sqlalchemy.engine import Result, Row
 async def create_thread(
     db: AsyncSession, thread_create: thread_schema.CreateThread
 ) -> model.Threads:
-    thread = model.Threads(**thread_create.dict())
+    thread = model.Threads(**thread_create.model_dump())
     db.add(thread)
     await db.commit()
     await db.refresh(thread)
@@ -21,10 +21,8 @@ async def create_thread(
 async def get_all_thread(
     db: AsyncSession,
     user_id: int,
-) -> Optional[List[thread_schema.DisplayResponseThread]]:
-    result: Result[
-        Tuple[thread_schema.DisplayResponseThread]
-    ] = await db.execute(
+) -> Optional[List[Tuple[thread_schema.DisplayResponseThread]]]:
+    result: Result = await db.execute(
         select(
             model.Threads.id,
             model.Threads.group_id,
@@ -32,6 +30,8 @@ async def get_all_thread(
             model.Threads.model_name,
             model.Threads.relate_num,
             model.Threads.search_method,
+            model.Threads.created_at,
+            model.Threads.update_at,
             model.Threads.collections_id,
             model.Collections.name.label("collection_name"),
         )
@@ -43,16 +43,15 @@ async def get_all_thread(
 
 # 特定のスレッド取得
 async def get_thread(
-    db: AsyncSession, thread_id: int
-) -> Optional[thread_schema.ResponseThread]:
-    result: Result[Tuple[thread_schema.ResponseThread]] = await db.execute(
-        select(model.Threads)
-        .outerjoin(model.Collections)
-        .filter(model.Threads.id == thread_id)
+    db: AsyncSession, user_id: int, thread_id: int
+) -> Optional[thread_schema.ChatHistoryResponseThread]:
+    result: Result = await db.execute(
+        select(
+            model.Threads
+        )
+        .filter(model.Threads.id == thread_id, model.Threads.publish)
     )
-    thread_data: Optional[
-        Row[Tuple[thread_schema.ResponseThread]]
-    ] = result.first()
+    thread_data = result.first()
     return thread_data[0] if thread_data is not None else None
 
 
@@ -66,7 +65,7 @@ async def update_thread(
     original.model_name = update_data.model_name
     original.relate_num = update_data.relate_num
     original.search_method = update_data.search_method
-    original.collections_id = update_data.collection_id
+    original.collections_id = update_data.collections_id
     await db.commit()
     await db.refresh(original)
     return original

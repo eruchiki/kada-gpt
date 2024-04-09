@@ -19,15 +19,32 @@ async def create_thread(
     return await cruds.create_thread(db, thread_body)
 
 
+# スレッド取得
+@router.get(
+    "/chat/users/{user_id}/thread/{thread_id}",
+    response_model=Optional[schema.ChatHistoryResponseThread],
+)
+async def get_thread(
+    user_id: int,
+    thread_id: int,
+    db: AsyncSession = Depends(get_db),
+) -> schema.ChatHistoryResponseThread:
+    thread_data = await cruds.get_thread(db, user_id, thread_id)
+    if thread_data is None:
+        raise HTTPException(status_code=404, detail=f"{thread_id} not Found")
+    return thread_data
+
+
 # スレッド一覧取得
 @router.get(
     "/chat/users/{user_id}/thread",
     response_model=List[schema.DisplayResponseThread],
 )
 async def get_thread_all(
+    user_id: int,
     db: AsyncSession = Depends(get_db),
 ) -> schema.DisplayResponseThread:
-    return await cruds.get_all_thread(db)
+    return await cruds.get_all_thread(db, user_id)
 
 
 # スレッド削除
@@ -45,14 +62,9 @@ async def delate_thread(
     return thread_info
 
 
-# スレッド内のチャット履歴取得
-@router.get("/chat/users/{user_id}/thread/{thread_id}",
-            response_model=schema.DeleteResponseThread)
-async def get_thraed_chat() -> dict:
-    return {}
-
-
 # チャット送受信
-@router.post("/chat/users/{user_id}/thread/{thread_id}")
-async def get_user_info() -> dict:
-    return {}
+# @router.post("/chat/{thread_id}/message")
+# async def get_user_info() -> :
+#     return {}
+
+# チャット履歴取得
