@@ -166,11 +166,11 @@ async def test_create_and_read(async_client: AsyncClient) -> None:
     response_obj = response.json()
     assert len(response_obj) == 1
     # document add
-    fileName1 = "原稿.pdf"
-    fileName2 = "原稿_v3_FIN.pdf"
+    fileName1 = "/src/tests/fit.pdf"
+    fileName2 = "/src/tests/jsai.pdf"
 
-    fileDataBinary1 = open("/src/tests/原稿.pdf", "rb").read()
-    fileDataBinary2 = open("/src/tests/原稿_v3_FIN.pdf", "rb").read()
+    fileDataBinary1 = open(fileName1, "rb").read()
+    fileDataBinary2 = open(fileName2, "rb").read()
 
     mime_type = "application/pdf"
     fileList = fileList = [

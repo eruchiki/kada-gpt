@@ -98,7 +98,7 @@ async def add_documents(
         file_paths,
         [document.__dict__["id"] for document in document_list],
     )
-    with open("test.txt", "w") as f:
-        for document in document_list:
-            f.write(str(document.__dict__) + "\n")
+    # with open("test.txt", "w") as f:
+    #     for document in document_list:
+    #         f.write(str(document.__dict__) + "\n")
     return document_list

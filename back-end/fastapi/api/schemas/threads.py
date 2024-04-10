@@ -57,8 +57,8 @@ class CreateResponseThread(CreateThread):
 
 
 class SendMessage(BaseModel):
-    user_id: int
-    thead_id: int
+    create_user_id: int
+    thread_id: int
     collection_id: int
     relate_num: Optional[int] = Field(None, example=5)
     search_method: Optional[str] = Field(None, description="検索手法を指定")
@@ -74,8 +74,6 @@ class ResponseMessage(BaseModel):
 class DesplayResponseMessage(ResponseMessage):
     message_text: str
     response_text: str
-    relate_number: str
-    create_time: float
-    document_id: str
+    relate_num: int
     created_at: datetime
     update_at: datetime

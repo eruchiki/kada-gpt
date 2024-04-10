@@ -11,15 +11,15 @@ client = QdrantClient(host=VS_URL, port=VS_PORT)
 collections = client.get_collections().collections
 collection_names = [collection.name for collection in collections]
 print(collection_names)
-# condition = models.FieldCondition(
-#     key="metadata.fileid", match=models.MatchValue(value="15")
-# )
-# scroll_filter = models.Filter(must=[condition])
-# results = client.scroll(
-#     collection_name="30", scroll_filter=scroll_filter,
-#     limit=1000
-# )
+condition = models.FieldCondition(
+    key="metadata.fileid", match=models.MatchValue(value="1")
+)
+scroll_filter = models.Filter(must=[condition])
+results = client.scroll(
+    collection_name="1", scroll_filter=scroll_filter,
+    limit=1000
+)
 
-print(collection_names)
-print(client.delete_collection(collection_name="1"))
-# print(results)
+# print(collection_names)
+# print(client.delete_collection(collection_name="1"))
+print(results)

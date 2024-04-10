@@ -19,3 +19,6 @@ log/
 back-end/mysql/data/
 back-end/qdrant/
 *.pdf
+.*_history
+.ssh
+.gnupg

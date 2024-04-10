@@ -32,6 +32,7 @@ class Users(Base):
 
     group = relationship("Groups", back_populates="user")
     thread = relationship("Threads", back_populates="user")
+    chat = relationship("Chat", back_populates="user")
     collection = relationship("Collections", back_populates="user")
     document = relationship("Documents", back_populates="user")
 
@@ -80,10 +81,14 @@ class Chat(Base):
     __tablename__ = "chat"
 
     id = Column(Integer, primary_key=True)
+    create_user_id = Column(Integer, ForeignKey("users.id"))
     thread_id = Column(Integer, ForeignKey("threads.id"))
+    collection_id = Column(Integer, ForeignKey("collections.id"))
     message_text = Column(Text)
     response_text = Column(Text)
-    create_time = Column(Float)
+    relate_num = Column(Integer)
+    search_method = Column(String(100))
+    model_name = Column(String(100))
     created_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
@@ -91,9 +96,11 @@ class Chat(Base):
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
     relate_number = Column(Text)
-    document_id = Column(Text)
+    # document_id = Column(Text)
     publish = Column(Boolean, default=True)
+    user = relationship("Users", back_populates="chat")
     thread = relationship("Threads", back_populates="chat")
+    collection = relationship("Collections", back_populates="chat")
 
 
 class Collections(Base):
@@ -112,6 +119,7 @@ class Collections(Base):
     user = relationship("Users", back_populates="collection")
     thread = relationship("Threads", back_populates="collection")
     document = relationship("Documents", back_populates="collection")
+    chat = relationship("Chat", back_populates="collection")
 
 
 class Documents(Base):
