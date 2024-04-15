@@ -22,3 +22,5 @@ back-end/qdrant/
 .*_history
 .ssh
 .gnupg
+.gitconfig
+test.txt
