@@ -1,10 +1,10 @@
 from langchain.schema import Document
-from langchain.vectorstores import Qdrant
+from langchain_community.vectorstores import Qdrant
 from qdrant_client import QdrantClient
 from langchain.embeddings import OpenAIEmbeddings
 from qdrant_client.models import Distance, VectorParams
 from api.module.preprocessing import morpheme
-from langchain.retrievers import BM25Retriever
+from langchain_community.retrievers import BM25Retriever
 from typing import Any
 
 

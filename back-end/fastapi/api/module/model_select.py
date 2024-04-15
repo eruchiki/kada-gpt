@@ -1,5 +1,5 @@
 from typing import Any
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 
 
 def select_model(model_name: str) -> Any:

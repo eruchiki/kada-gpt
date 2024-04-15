@@ -13,6 +13,7 @@ import api.module.document_reader as doc_reader
 import api.module.preprocessing as preprocess
 from langchain.schema import Document
 import datetime as dt
+from typing import Optional
 
 
 class VectorStore:
@@ -66,7 +67,7 @@ class VectorStore:
         ids: List[int],
     ) -> None:
         self.token_num = 0
-        for file, id in zip(files, ids):
+        for file, id, file_path in zip(files, ids, file_paths):
             text = doc_reader.pdf_reader(file)
             normalized_text = preprocess.normalize_text(text)
             self.token_num += preprocess.num_tokens_from_string(
@@ -79,6 +80,7 @@ class VectorStore:
                     metadata={
                         "type": "related",
                         "fileid": str(id),
+                        "filename": str(file_path),
                     }
                     | {"nth": i},
                 )
@@ -122,3 +124,19 @@ class VectorStore:
 
     async def load_pdf(self) -> None:
         pass
+
+    def seach_docs(
+        self,
+        query: str,
+        top_k: int = 3,
+        filter: Optional[dict] = None,
+        border: float = 0.7,
+    ) -> tuple[list, list]:
+        docs = self.qdrant.similarity_search_with_score(
+            query=query, k=top_k, filter=filter
+        )
+        related_data = [doc for doc, score in docs if score > border]
+        score_data = [score for doc, score in docs if score > border]
+        for i, item in enumerate(related_data):
+            item.metadata["rank"] = i
+        return related_data, score_data

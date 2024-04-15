@@ -4,6 +4,10 @@ import api.schemas.threads as thread_schema
 from sqlalchemy import select
 from typing import Tuple, Optional, List
 from sqlalchemy.engine import Result, Row
+from qdrant_client import QdrantClient
+import api.models.qdrant as qdrant
+import api.module.answer_create as answer_create
+import json
 
 
 # スレッド作成
@@ -46,10 +50,9 @@ async def get_thread(
     db: AsyncSession, user_id: int, thread_id: int
 ) -> Optional[thread_schema.ChatHistoryResponseThread]:
     result: Result = await db.execute(
-        select(
-            model.Threads
+        select(model.Threads).filter(
+            model.Threads.id == thread_id, model.Threads.publish
         )
-        .filter(model.Threads.id == thread_id, model.Threads.publish)
     )
     thread_data = result.first()
     return thread_data[0] if thread_data is not None else None
@@ -89,9 +92,38 @@ async def delete_thread(
 
 # メッセージ送信
 async def send_message(
-    db: AsyncSession, send_chat: thread_schema.SendMessage
+    db: AsyncSession, vs: QdrantClient, send_chat: thread_schema.SendMessage
 ) -> model.Chat:
-    chat = model.Chat(**send_chat.dict())
+    # info: Result = await db.execute(
+    #     select(
+    #         model.Documents.id,
+    #         model.Documents.collection_id,
+    #         model.Documents.create_user_id,
+    #         model.Documents.uri,
+    #         model.Documents.created_at,
+    #     ).filter(
+    #         model.Documents.publish,
+    #         model.Documents.create_user_id == send_chat.user_id,
+    #         model.Documents.collection_id == send_chat.collection_id,
+    #     )
+    # )
+    # document_info = []
+    # for row in info:
+    #     doc_meta = {"id": int(row[0]), "uri": str(row[3])}
+    #     document_info.append(doc_meta)
+    vs_client = qdrant.VectorStore(
+        collection_id=str(send_chat.collection_id), client=vs
+    )
+    vs_client.set_qdrant()
+    result = await answer_create.answer(
+        query=send_chat.message_text, db=vs_client.qdrant, mode="select"
+    )
+    with open("test.txt", "w") as f:
+        f.write(json.dumps(result).encode().decode("unicode-escape"))
+    output = {
+        "response_text": result["answer"],
+    }
+    chat = model.Chat(**dict(**send_chat.model_dump(), **output))
     db.add(chat)
     await db.commit()
     await db.refresh(chat)
@@ -100,8 +132,7 @@ async def send_message(
 
 # 履歴取得
 async def get_history(
-    db: AsyncSession,
-    thread_id: int
+    db: AsyncSession, thread_id: int
 ) -> Optional[List[thread_schema.DesplayResponseMessage]]:
     result: Result[Tuple[thread_schema.DesplayResponseMessage]] = (
         await db.execute(
@@ -113,7 +144,7 @@ async def get_history(
                 model.Chat.document_id,
                 model.Chat.create_time,
                 model.Chat.created_at,
-                model.Chat.update_at
+                model.Chat.update_at,
             )
             .outerjoin(model.Collections)
             .filter(model.Chat.publish, model.Chat.thread_id == thread_id)

@@ -1,10 +1,10 @@
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from api.module.answer_prompt import related_prompt, create_system_prompt
 from langchain import LLMChain
 from langchain.schema import Document
 from api.module.preprocessing import chunk_split
-from langchain.callbacks import get_openai_callback
-from langchain.vectorstores import Qdrant
+from langchain_community.callbacks import get_openai_callback
+from langchain_community.vectorstores import Qdrant
 from api.module.document_search import documents_search
 from api.module.related_select import select
 from typing import Optional, Any
@@ -32,13 +32,10 @@ def group_sentence(related_data: list) -> list:
 
 
 # 回答作成
-def compose(
-    selected_info_list: list, query: str, model: Any
-) -> dict:
-    llm = ChatOpenAI(temperature=0, model=model, timeout=300)
+def compose(selected_info_list: list, query: str, llm: Any) -> dict:
     prompt = create_system_prompt()
-    string_info, file_list, for_log_quote_lines = (
-        related_prompt(selected_info_list)
+    string_info, file_list, for_log_quote_lines = related_prompt(
+        selected_info_list
     )
     prompt_str = prompt.format(query=query, info=string_info)
     llm_chain = LLMChain(
@@ -75,13 +72,13 @@ def compose(
         "answer": response,
         "cost": cost,
         "res_line": res_quote_lines,
-        "res_file": res_quote_files
+        "res_file": res_quote_files,
     }
     return for_log_compose_data
 
 
 # 回答
-def answer(
+async def answer(
     query: str,
     # llm: Any,
     db: Qdrant,
@@ -89,7 +86,7 @@ def answer(
     relate_num: int = 4,
     filter: Optional[dict] = None,
 ) -> dict:
-    llm = ChatOpenAI(temperature=0, model="gpt4", timeout=300)
+    llm = ChatOpenAI(temperature=0, model="gpt-4-turbo", timeout=300)
     if mode == "default":
         related_data, score_data = documents_search(
             db, query, top_k=relate_num, filter=filter
@@ -99,6 +96,8 @@ def answer(
         related_data, score_data = documents_search(
             db, query, top_k=relate_num, filter=filter
         )
-        related_info = select(related_data, query)
+        related_info, cost, for_log_select_data = await select(
+            related_data, query
+        )
     for_log_compose_data = compose(related_info, query, llm)
     return for_log_compose_data

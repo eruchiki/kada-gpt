@@ -1,12 +1,12 @@
 from langchain.prompts import (
     PromptTemplate,
 )
-from template import SYSTEM_TEMPLATE
-from langchain.chat_models import ChatOpenAI
+from api.module.template import SYSTEM_TEMPLATE
+from langchain_openai import ChatOpenAI
 from langchain.schema import Document
 from langchain import LLMChain
 from api.module.preprocessing import chunk_split
-from langchain.callbacks import get_openai_callback
+from langchain_community.callbacks import get_openai_callback
 from typing import Any
 import re
 import asyncio
@@ -37,7 +37,7 @@ def create_prompt_info_for_select(
 
 
 # Qdrantから取ってきた文書に対し，情報の取捨選択をGPTに行わせる
-def select(related_data: list, query: str) -> tuple[list, int, list]:
+async def select(related_data: list, query: str) -> list:
     prompt = PromptTemplate(
         input_variables=["filename", "info", "query"], template=SYSTEM_TEMPLATE
     )
@@ -54,8 +54,8 @@ def select(related_data: list, query: str) -> tuple[list, int, list]:
         string_info_list.append(string_info)
         info_list.append(info)
         filename_list.append(filename)
-    tmp_list = asyncio.run(
-        generate_concurrently(string_info_list, filename_list, query, prompt)
+    tmp_list = await generate_concurrently(
+        string_info_list, filename_list, query, prompt
     )
     each_cost = [cost for resp, cost in tmp_list]
     total_cost = sum(each_cost)
@@ -74,7 +74,7 @@ def select(related_data: list, query: str) -> tuple[list, int, list]:
             [prompt_str, response, cost, res_format, select_lines]
         )
 
-    return selected_info_list, total_cost, for_log_select_data
+    return [selected_info_list, total_cost, for_log_select_data]
 
 
 # selectionのプロンプトでGPT3.5に問い合わせ
