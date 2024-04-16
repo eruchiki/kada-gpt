@@ -13,15 +13,16 @@ import re
 
 # ドキュメントをグルーピング
 def group_sentence(related_data: list) -> list:
+    related_info = []
     for relate in related_data:
         group = []
-        related_info = []
         split_text = chunk_split(relate.page_content)
         for i, text in enumerate(split_text):
             info = Document(
                 page_content=text,
                 metadata={
                     "filename": relate.metadata["filename"],
+                    "fileid": relate.metadata["fileid"],
                     "rank": relate.metadata["rank"],
                     "item_number": i,
                 },
@@ -34,7 +35,7 @@ def group_sentence(related_data: list) -> list:
 # 回答作成
 def compose(selected_info_list: list, query: str, llm: Any) -> dict:
     prompt = create_system_prompt()
-    string_info, file_list, for_log_quote_lines = related_prompt(
+    string_info, fileid_list, for_log_quote_lines = related_prompt(
         selected_info_list
     )
     prompt_str = prompt.format(query=query, info=string_info)
@@ -62,8 +63,8 @@ def compose(selected_info_list: list, query: str, llm: Any) -> dict:
         if i in ret_lines
     ]
     res_quote_files = [
-        {"number": i, "file_name": file}
-        for i, file in enumerate(file_list)
+        {"number": i, "document_id": fileid}
+        for i, fileid in enumerate(fileid_list)
         if i in nums_ref
     ]
 
@@ -80,13 +81,13 @@ def compose(selected_info_list: list, query: str, llm: Any) -> dict:
 # 回答
 async def answer(
     query: str,
-    # llm: Any,
     db: Qdrant,
+    model: str = "gpt-3.5-turbo",
     mode: str = "default",
-    relate_num: int = 4,
+    relate_num: int = 3,
     filter: Optional[dict] = None,
 ) -> dict:
-    llm = ChatOpenAI(temperature=0, model="gpt-4-turbo", timeout=300)
+    llm = ChatOpenAI(temperature=0, model=model, timeout=300)
     if mode == "default":
         related_data, score_data = documents_search(
             db, query, top_k=relate_num, filter=filter

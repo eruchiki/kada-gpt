@@ -90,7 +90,7 @@ async def get_documents(
 
 # 特定のドキュメント取得
 @router.get(
-    "/chat/collections/{collection_id}/{documents_id}",
+    "/chat/collections/{collection_id}/{document_id}",
     response_model=List[Any],
 )
 async def get_document(
@@ -112,7 +112,7 @@ async def get_document(
 
 # ドキュメント削除
 @router.delete(
-    "/chat/collections/{collection_id}/{documents_id}",
+    "/chat/collections/{collection_id}/{document_id}",
     response_model=schemas.DelateResponseDocument,
 )
 async def delate_documents(

@@ -6,6 +6,7 @@ import api.schemas.threads as schema
 from sqlalchemy.ext.asyncio import AsyncSession
 import api.cruds.threads as cruds
 from qdrant_client import QdrantClient
+from fastapi.responses import FileResponse
 
 
 router = APIRouter()
@@ -69,22 +70,22 @@ async def delate_thread(
 # チャット送受信
 @router.post(
     "/chat/users/{user_id}/thread/{thread_id}",
-    response_model=schema.DesplayResponseMessage,
+    response_model=schema.ResponseMessage,
 )
 async def send_message(
     message_body: schema.SendMessage,
     db: AsyncSession = Depends(get_db),
     vs: QdrantClient = Depends(get_vs),
-) -> schema.DesplayResponseMessage:
+) -> schema.ResponseMessage:
     return await cruds.send_message(db, vs, message_body)
 
 
 # チャット履歴取得
 @router.get(
-    "/chat/users/{user_id}/thread/{thread_id}",
+    "/chat/users/{user_id}/thread/{thread_id}/history",
     response_model=List[schema.DesplayResponseMessage],
 )
-async def get_all_messages(
+async def get_history(
     user_id: int, thread_id: int, db: AsyncSession = Depends(get_db)
 ) -> List[schema.DesplayResponseMessage]:
-    return await cruds.get_all_messages(db, user_id, thread_id)
+    return await cruds.get_history(db, user_id, thread_id)

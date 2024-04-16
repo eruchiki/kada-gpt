@@ -116,23 +116,28 @@ async def send_message(
     )
     vs_client.set_qdrant()
     result = await answer_create.answer(
-        query=send_chat.message_text, db=vs_client.qdrant, mode="select"
+        query=send_chat.message_text,
+        db=vs_client.qdrant,
+        mode=send_chat.search_method,
+        model=send_chat.model_name,
+        relate_num=send_chat.relate_num,
     )
-    with open("test.txt", "w") as f:
-        f.write(json.dumps(result).encode().decode("unicode-escape"))
+    result["res_file"]
     output = {
         "response_text": result["answer"],
+        "references": json.dumps(result["res_file"], ensure_ascii=False),
     }
     chat = model.Chat(**dict(**send_chat.model_dump(), **output))
     db.add(chat)
     await db.commit()
     await db.refresh(chat)
+    chat.references = result["res_file"]
     return chat
 
 
 # 履歴取得
 async def get_history(
-    db: AsyncSession, thread_id: int
+    db: AsyncSession, user_id: int, thread_id: int
 ) -> Optional[List[thread_schema.DesplayResponseMessage]]:
     result: Result[Tuple[thread_schema.DesplayResponseMessage]] = (
         await db.execute(
@@ -140,14 +145,20 @@ async def get_history(
                 model.Chat.id,
                 model.Chat.message_text,
                 model.Chat.response_text,
-                model.Chat.relate_number,
-                model.Chat.document_id,
-                model.Chat.create_time,
+                model.Chat.relate_num,
+                model.Chat.search_method,
+                model.Chat.model_name,
+                model.Chat.references,
                 model.Chat.created_at,
                 model.Chat.update_at,
-            )
-            .outerjoin(model.Collections)
-            .filter(model.Chat.publish, model.Chat.thread_id == thread_id)
+            ).filter(model.Chat.publish, model.Chat.thread_id == thread_id)
         )
     )
-    return result.all()
+
+    result = result.mappings().all()
+    result2 = []
+    for item in result:
+        item = dict(item)
+        item["references"] = json.loads(item["references"])
+        result2.append(item)
+    return result2

@@ -26,6 +26,7 @@ def create_prompt_info_for_select(
             page_content=text,
             metadata={
                 "filename": relate_info.metadata["filename"],
+                "fileid": relate_info.metadata["fileid"],
                 "rank": relate_info.metadata["rank"],
                 "item_number": i,
             },

@@ -82,12 +82,15 @@ class SendMessage(BaseModel):
 
 class ResponseMessage(BaseModel):
     id: int
+    message_text: str
+    response_text: str
+    references: list
+    created_at: datetime
+    update_at: datetime
     model_config = ConfigDict(from_attributes=True)
 
 
 class DesplayResponseMessage(ResponseMessage):
-    message_text: str
-    response_text: str
     relate_num: int
-    created_at: datetime
-    update_at: datetime
+    search_method: str
+    model_name: str
