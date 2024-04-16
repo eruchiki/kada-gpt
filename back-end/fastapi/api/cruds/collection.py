@@ -98,7 +98,55 @@ async def add_documents(
         file_paths,
         [document.__dict__["id"] for document in document_list],
     )
-    # with open("test.txt", "w") as f:
-    #     for document in document_list:
-    #         f.write(str(document.__dict__) + "\n")
     return document_list
+
+
+# 任意のコレクション中の全ドキュメント取得
+async def get_all_documents(
+    db: AsyncSession, collection_id: int
+) -> Optional[List[Tuple[int, int, int, str, datetime, datetime]]]:
+    result: Result = await db.execute(
+        select(
+            model.Documents.id,
+            model.Documents.collection_id,
+            model.Documents.create_user_id,
+            model.Documents.uri,
+            model.Documents.created_at,
+            model.Documents.update_at,
+        ).filter(
+            model.Documents.publish,
+            model.Documents.collection_id == collection_id,
+        )
+    )
+    return result.all()
+
+
+# 特定のドキュメント取得
+async def get_document(
+    db: AsyncSession, collection_id: int, document_id: int
+) -> Optional[model.Documents]:
+    result: Result = await db.execute(
+        select(model.Documents).filter(
+            model.Documents.id == document_id,
+            model.Documents.collection_id == collection_id,
+            model.Documents.publish,
+        )
+    )
+    document_data = result.first()
+    return document_data[0] if document_data is not None else None
+
+
+# ドキュメント削除
+async def delete_document(
+    db: AsyncSession,
+    vs: QdrantClient,
+    original: model.Documents,
+) -> Optional[model.Documents]:
+    not original.publish
+    await db.commit()
+    await db.refresh(original)
+    document_id = str(original.id)
+    collection_id = str(original.collection_id)
+    vs_client = qdrant.VectorStore(collection_id=collection_id, client=vs)
+    vs_client.delete_document(document_id)
+    return original

@@ -33,3 +33,21 @@ class AddDocument(BaseModel):
 class AddResponseDocument(BaseModel):
     id: int
     model_config = ConfigDict(from_attributes=True)
+
+
+class ResponseDocuments(BaseModel):
+    id: int
+    collection_id: int
+    create_user_id: int
+    uri: str
+    created_at: datetime
+    update_at: datetime
+
+
+class DelateResponseDocument(BaseModel):
+    id: int
+    collection_id: int
+    create_user_id: int
+    uri: str
+    created_at: datetime
+    update_at: datetime

@@ -140,3 +140,16 @@ class VectorStore:
         for i, item in enumerate(related_data):
             item.metadata["rank"] = i
         return related_data, score_data
+
+    def delete_document(self, document_id: str) -> None:
+        condition = models.FieldCondition(
+            key="metadata.fileid", match=models.MatchValue(value=document_id)
+        )
+        point_filter = models.Filter(must=[condition])
+        try:
+            self.client.delete(
+                collection_name=self.collection_id,
+                points_selector=point_filter,
+            )
+        except NotImplementedError as e:
+            raise HTTPException(status_code=500, detail=e)

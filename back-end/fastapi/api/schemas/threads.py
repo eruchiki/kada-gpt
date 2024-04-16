@@ -60,10 +60,24 @@ class SendMessage(BaseModel):
     create_user_id: int
     thread_id: int
     collection_id: int
-    relate_num: Optional[int] = Field(None, example=5)
-    search_method: Optional[str] = Field(None, description="検索手法を指定")
-    model_name: Optional[str] = Field(None, description="モデル名を指定")
-    message_text: str = Field(None, description="メッセージ")
+    relate_num: int = Field(
+        None, description="検索で取得するドキュメント数", example=3
+    )
+    search_method: str = Field(
+        "default",
+        description="検索手法を指定",
+        json_schema_extra={"example": "select"},
+    )
+    model_name: str = Field(
+        None,
+        description="モデル名を指定",
+        json_schema_extra={"example": "gpt-3.5-turbo"},
+    )
+    message_text: str = Field(
+        None,
+        description="メッセージ",
+        json_schema_extra={"example": "Hello World!"},
+    )
 
 
 class ResponseMessage(BaseModel):

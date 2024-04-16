@@ -7,6 +7,7 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     Text,
+    JSON,
 )
 from sqlalchemy.sql import func
 from api.db import Base
@@ -96,7 +97,7 @@ class Chat(Base):
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
     relate_number = Column(Text)
-    # document_id = Column(Text)
+    document_id = Column(JSON, nullable=True)
     publish = Column(Boolean, default=True)
     user = relationship("Users", back_populates="chat")
     thread = relationship("Threads", back_populates="chat")
@@ -130,6 +131,9 @@ class Documents(Base):
     create_user_id = Column(Integer, ForeignKey("users.id"))
     uri = Column(String(1000))
     created_at = Column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    update_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
     publish = Column(Boolean, default=True)
