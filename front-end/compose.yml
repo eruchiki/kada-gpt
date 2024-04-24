@@ -1,3 +1,17 @@
+services:
+  app:
+    build: 
+      context: ./chat/
+      dockerfile: Dockerfile
+    volumes:
+      - ./chat:/src
+    ports:
+      - 3000:3000
+    # command: bash -c "cd labshare && yarn dev"
+    tty: true
+    networks:
+      - kada-gpt-front
+
 # services:
 #   streamlit:
 #     build:
@@ -16,7 +30,7 @@
 #         max-size: 100m
 #         max-file: '10'
 
-# networks:
-#   kada-gpt-front:
-#     name: kada-gpt-front
-#     driver: bridge
+networks:
+  kada-gpt-front:
+    name: kada-gpt-front
+    driver: bridge

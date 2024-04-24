@@ -1,0 +1,24 @@
+services:
+  app:
+    build: 
+      context: ./chat/
+      dockerfile: Dockerfile
+    volumes:
+      - app-vscode:/src/.vscode-server
+      - node_modules:/src/node_modules
+      - ./chat/app:/src
+    ports:
+      - 3000:3000
+    command: bash -c "next dev"
+    tty: true
+    networks:
+      - kada-gpt-front
+
+volumes:
+  node_modules:
+  app-vscode:
+
+networks:
+  kada-gpt-front:
+    name: kada-gpt-front
+    driver: bridge
