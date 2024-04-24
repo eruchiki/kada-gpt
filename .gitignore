@@ -23,3 +23,40 @@ back-end/qdrant/
 .ssh
 .gnupg
 .gitconfig
+
+# Front end
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/front-end/chat/node_modules
+/front-end/chat/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+/front-end/chat/coverage
+
+# next.js
+/front-end/chat/.next/
+/front-end/chat/out/
+
+# production
+/front-end/chat/build
+
+# misc
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts

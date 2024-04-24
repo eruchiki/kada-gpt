@@ -1,22 +1,26 @@
 services:
   app:
     build: 
-      context: ./chat/
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile.dev
     volumes:
-      - app-vscode:/src/.vscode-server
-      - node_modules:/src/node_modules
-      - ./chat/app:/src
+      - app-vscode-server:/app/.vscode-server
+      # - app-vscode:/vscode
+      - node_modules:/app/node_modules
+      - ./chat:/app
     ports:
       - 3000:3000
-    command: bash -c "next dev"
+    env_file:
+      - .env.dev
     tty: true
+    stdin_open: true
     networks:
       - kada-gpt-front
 
 volumes:
   node_modules:
-  app-vscode:
+  app-vscode-server:
+  # app-vscode:
 
 networks:
   kada-gpt-front:

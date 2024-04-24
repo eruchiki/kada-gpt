@@ -1,11 +1,11 @@
 {
-  "name": "Docker-Nextjs",
+  "name": "Docker-Next.js",
   "dockerComposeFile": [
     "../compose.dev.yml",
     "compose.extend.yml"
   ],
   "service": "app",
-  "workspaceFolder": "/src",
+  "workspaceFolder": "/app",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -21,7 +21,7 @@
         "editor.formatOnSave": true,
         "editor.formatOnPaste": true,
         "editor.codeActionsOnSave": {
-          "source.fixAll": "always"
+          "source.fixAll.eslint": "always"
         },
         "eslint.alwaysShowStatus": true
       }

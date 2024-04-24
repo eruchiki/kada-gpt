@@ -1,12 +1,12 @@
 'use client';
 
-import Header from '@/components/Header';
+import Header from '@/src/components/Header';
 import Axios from 'axios';
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import  axios  from 'axios';
 
-export default async function Page() {
+export default function Page() {
   const { data: session, status } = useSession()
   const [ThredList, setThreadList] = useState<Array<any>>([]);
   if (status === 'loading') {
@@ -19,12 +19,12 @@ export default async function Page() {
       </>
     )
   }else{
-    const threadlist = await axios.get(`${process.env.HOST_URL}/user/thread`,
+    const threadlist = axios.get(`${process.env.HOST_URL}/user/thread`,
                                         {user_id:session.userid});
     return (
       <>
       <Header></Header>
       </>
-    )                                   
+    )
   }
 }

@@ -1,6 +1,6 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from "next-auth/providers/credentials";
-import DecodeBase64 from '@/components/CipherDecode';
+import DecodeBase64 from '@/src/components/CipherDecode';
 import axios from 'axios';
 
 
