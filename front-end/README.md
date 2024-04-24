@@ -1,36 +1,26 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## 開発を始める(初回起動時)
+### 前提条件
+VSCode及びDocker(Docker Desktop)が導入済みかつ，VSCodeの拡張機能のRemote Developmentがインストールされていること
 
-## Getting Started
+### 手順
+左カラムからリモートエクスプローラーを選択
+- `開発コンテナ`リストが表示されるので，その欄の右にある`+`ボタンをクリック
+- `コンテナーでフォルダーを開く`を選択
+- 本プロジェクトの`front-end`を選択
+- 右下の開くをクリック
 
-First, run the development server:
+初回起動時は開発環境のセットアップに時間がかかるため，待つ
+セットアップ終了時にリロードするか聞かれる場合があるので，その場合はリロードボタンをクリック
 
+## 開発コンテナ(2回目以降)
+リモートエクスプローラーから開発コンテナを選択すればOK
+
+## 本番環境
+本ディレクトリ(./back-end 配下)で以下のコマンドを実行
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+docker compose up -d
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## アクセス
+ブラウザから`localhost:3000`にアクセスすることで確認できる．
+コンテナ内で編集を行った場合，即座に反映される(ホットリロード)
