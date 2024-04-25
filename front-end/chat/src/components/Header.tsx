@@ -6,25 +6,32 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Login from './Login';
 import MenuButton from './MenuButton';
+import ThreadsPropsType from '../types/ThreadProps';
 import PersistentDrawerLeft from './PersistentDrawerLeft';
 
 
-const Header = () => {
-    const [open, setOpen] = React.useState(false);
+const Header: React.FC<{ threadlist: ThreadsPropsType[] }> = ({
+  threadlist,
+}) => {
+  const [open, setOpen] = React.useState(false);
   return (
-    <div style = {{ width:"100%" }}>
+    <div style={{ width: "100%" }}>
       <AppBar position="static">
         <Toolbar>
-         <MenuButton open={open} setOpen={setOpen} />
+          <MenuButton open={open} setOpen={setOpen} />
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Kada GPT
           </Typography>
-          <Login/>
+          <Login />
         </Toolbar>
       </AppBar>
-      <PersistentDrawerLeft open={open} setOpen={setOpen}/>
+      <PersistentDrawerLeft
+        open={open}
+        setOpen={setOpen}
+        threadlist={threadlist}
+      />
     </div>
   );
-}
+};
 
 export default Header

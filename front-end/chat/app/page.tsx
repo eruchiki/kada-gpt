@@ -1,30 +1,18 @@
 'use client';
 
 import Header from '@/src/components/Header';
+import Chat from '@/src/components/Chat/Chat';
+import { useState } from 'react';
 import Axios from 'axios';
 import { useSession } from 'next-auth/react';
-import { useState } from 'react';
-import  axios  from 'axios';
+
 
 export default function Page() {
-  const { data: session, status } = useSession()
-  const [ThredList, setThreadList] = useState<Array<any>>([]);
-  if (status === 'loading') {
-    return <div>Loading...</div>;
-  }
-  if(!session){
+  const threadlist = [{"id":1,"name":"test1"},{"id":2,"name":"test2"}]
   return (
       <>
-      <Header></Header>
+      <Header threadlist={threadlist}></Header>
+      <Chat></Chat>
       </>
     )
-  }else{
-    const threadlist = axios.get(`${process.env.HOST_URL}/user/thread`,
-                                        {user_id:session.userid});
-    return (
-      <>
-      <Header></Header>
-      </>
-    )
-  }
 }

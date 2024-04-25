@@ -1,13 +1,12 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from "next-auth/providers/credentials";
 import DecodeBase64 from '@/src/components/CipherDecode';
-import axios from 'axios';
+import GetUser from '../../api/GetUser'
 
 
 async function findUserByCredentials(credentials:any){
     // ログイン可能であればユーザidを返し、不可能であればnullを返す
-    const login_data = await axios.post(`${process.env.HOST_URL}/user/`,
-                                            {user_name:credentials.user});
+    const login_data = await GetUser(credentials.user)
     console.log(login_data)
     if (!login_data) {
       return null

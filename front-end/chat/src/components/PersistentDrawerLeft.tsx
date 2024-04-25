@@ -6,7 +6,7 @@ import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import SideMenuPropsTypewithThreads from '@types/SideMenuPropsTypewithThreads';
+import SideMenuPropsTypewithThreads from '../types/SideMenuwithThreadProps';
 import SideMenuList from './SideMenuList';
 
 const drawerWidth = 240;

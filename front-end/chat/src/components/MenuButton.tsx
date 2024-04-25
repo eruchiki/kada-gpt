@@ -1,7 +1,7 @@
 import React from "react"
 import { IconButton } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
-import SideMenuPropsType from "@/types/SideMenuProps";
+import SideMenuPropsType from "../types/SideMenuProps";
 
 const MenuButton = (props:SideMenuPropsType) => {
     const handleDrawerOpen = () => {
