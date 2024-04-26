@@ -12,7 +12,7 @@ const MenuButton = (props:SideMenuPropsType) => {
             color="inherit"
             aria-label="open drawer"
             onClick={handleDrawerOpen}
-            edge="start"
+            edge="start"  
             sx={{ mr: 2, ...(props.open && { display: 'none' }) }}
           >
             <MenuIcon />

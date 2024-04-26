@@ -1,6 +1,6 @@
 import * as React from "react";
 
-type ThreadsPropsType = {
+type ThreadInfoPropsType = {
   id:number,
   name: string,
   model_name: string,
@@ -10,4 +10,4 @@ type ThreadsPropsType = {
   create_user_id: number,
   group_id: number
 }
-export default ThreadsPropsType;
+export default ThreadInfoPropsType;

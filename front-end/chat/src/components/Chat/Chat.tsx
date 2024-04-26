@@ -1,17 +1,18 @@
 "use client";
 
 import {useState} from 'react';
-import axios from "axios";
 import PromptInput from "../PromptInput/PromptInput";
 import './Chat.css';
 import GetChatHisotry from '@/app/api/GetChatHistory';
 import SendMessage from "@/app/api/SendMessage";
-import ThreadInfoPropsTypes from "../../types/ThreadInfoProps";
+import ChatHisotryPropsType from '@/src/types/ChatHistoryTypes';
+import ThreadInfoPropsType from "../../types/ThreadInfoProps";
 import PromptResponseList from "../PromptResponseList/PromptResponseList";
-import { threadId } from 'worker_threads';
 
 
-const Chat = (ThreadData: ThreadInfoPropsTypes) => {
+const Chat: React.FC<{ ThreadData: ThreadInfoPropsType }> = ({
+  ThreadData,
+}) => {
   // const [responseList, setResponseList] = useState<ChatHisotryPropsType[]>([]);
   const [prompt, setPrompt] = useState<string>("");
   // const [promptToRetry, setPromptToRetry] = useState<string | null>(null);
@@ -137,7 +138,32 @@ const Chat = (ThreadData: ThreadInfoPropsTypes) => {
   //     setIsLoading(false);
   //   }
   // }
-  const responseList = GetChatHisotry(ThreadData.create_user_id,ThreadData.id);
+  
+  // const responseList = GetChatHisotry(ThreadData.create_user_id,ThreadData.id);
+  const responseList: ChatHisotryPropsType[] = [
+    {
+      id: 1,
+      message_text: "hello",
+      response_text: "hello",
+      referances: ["a", "b", "c"],
+      created_at: "1",
+      update_at: "1",
+      relate_num: 4,
+      search_method: "default",
+      model_name: "gpt3",
+    },
+    {
+      id: 1,
+      message_text: "こんにちは",
+      response_text: "元気です",
+      referances: ["a", "b", "c"],
+      created_at: "1",
+      update_at: "1",
+      relate_num: 4,
+      search_method: "default",
+      model_name: "gpt3",
+    },
+  ];
   return (
     <div className="App">
       <div id="response-list">
@@ -152,7 +178,6 @@ const Chat = (ThreadData: ThreadInfoPropsTypes) => {
         )
       } */}
       <div id="model-select-container">
-        <label htmlFor="model-select">Select model:</label>
         {/* <select id="model-select" value={modelValue} onChange={(event) => setModelValue(event.target.value as ModelValueType)}>
           <option value="gpt">GPT-3 (Understand and generate natural language )</option>
           <option value="codex">Codex (Understand and generate code, including translating natural language to code)
@@ -179,7 +204,7 @@ const Chat = (ThreadData: ThreadInfoPropsTypes) => {
         />
         <button
           id="submit-button"
-          className={isLoading ? "loading" : ""}
+          // className={isLoading ? "loading" : ""}
           onClick={() =>
             SendMessage({
               create_user_id: ThreadData.create_user_id,

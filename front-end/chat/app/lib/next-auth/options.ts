@@ -6,12 +6,14 @@ import GetUser from '../../api/GetUser'
 
 async function findUserByCredentials(credentials:any){
     // ログイン可能であればユーザidを返し、不可能であればnullを返す
-    const login_data = await GetUser(credentials.user)
+  // const login_data = await GetUser(credentials.user)
+  const login_data = {"user":"test_user","password":"password"}
     console.log(login_data)
     if (!login_data) {
       return null
-    } else if(typeof login_data.password === "string"){
-        const decodepass = DecodeBase64(login_data.password)
+    } else if (typeof login_data.password === "string") {
+      // const decodepass = DecodeBase64(login_data.password)
+      const decodepass = "password"
         if (decodepass === credentials.password){
           return login_data
     }else{

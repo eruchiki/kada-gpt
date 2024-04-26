@@ -1,7 +1,7 @@
 import Menu from "@mui/material/Menu";
 import { signOut } from "next-auth/react";
 import { MenuItem } from "@mui/material";
-import UserMenuPropsType from "@/types/UserMenuProps";
+import UserMenuPropsType from "../types/UserMenuProps";
 
 const UserMenu = (props:UserMenuPropsType) => {
     const handleClose = () => {

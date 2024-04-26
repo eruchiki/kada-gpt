@@ -2,7 +2,7 @@ import * as React from "react";
 
 
 type ChatHisotryPropsType = {
-  id: string;
+  id: number;
   message_text: string;
   response_text: string;
   referances: string[];

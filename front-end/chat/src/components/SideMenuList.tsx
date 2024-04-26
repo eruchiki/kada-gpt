@@ -1,24 +1,47 @@
-import React from 'react';
-import { List,ListItem,ListItemText } from '@mui/material';
-import Link from 'next/link';
-import ThreadsPropsType from '../types/ThreadProps';
+import React from "react";
+import { List, Link, ListItem,  ListItemButton, ListItemIcon } from "@mui/material";
+import ThreadsPropsType from "../types/ThreadProps";
+import ThreadPopup from "./ThreadPopUp"
 
 
-const SideMenuList : React.FC<{threadlist:ThreadsPropsType[]}> = ({threadlist}) => {
+const SideMenuList: React.FC<{ threadlist: ThreadsPropsType[] }> = ({
+  threadlist,
+}) => {
   // const menulist = ["仕事","新規作成"]
   // const menupath = [`${process.env.NEXT_PUBLIC_ROOTPATH}/thread/1`,`${process.env.NEXT_PUBLIC_ROOTPATH}/thread/2`]
   return (
     <>
       <List>
-        {threadlist.map(thread => (
-          <Link href={`${process.env.NEXT_PUBLIC_ROOTPATH}/thread/${thread.id}`}>
-          <ListItem button key={thread.name}>
-            <ListItemText primary={thread.name} />
+        <ListItem key="threadcreate" disablePadding>
+          {/* <ListItemButton onClick={}> */}
+          <ListItemButton>
+            <ThreadPopup />
+            {/* <ListItemIcon>
+              <AddIcon />
+            </ListItemIcon> */}
+            {/* <Link
+              href={`${process.env.NEXT_PUBLIC_ROOTPATH}/thread/${thread.id}`}
+              key={thread.name}
+              underline="none"
+            >
+            </Link> */}
+          </ListItemButton>
+        </ListItem>
+        {threadlist.map((thread) => (
+          <ListItem key={thread.name} disablePadding>
+            <ListItemButton>
+              <Link
+                href={`${process.env.NEXT_PUBLIC_ROOTPATH}/thread/${thread.id}`}
+                key={thread.name}
+                underline="none"
+              >
+                {thread.name}
+              </Link>
+            </ListItemButton>
           </ListItem>
-          </Link>
         ))}
       </List>
     </>
   );
-}
-export default SideMenuList
+};
+export default SideMenuList;

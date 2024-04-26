@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const GetThreadList = (userid: string) => {
-  const url = `/${userid}/thread`;
-  const threadlist = axios.post(url);
+  const url = `${process.env.HOST_URL}/chat/${userid}/thread`;
+  const threadlist = axios.get(url);
   return threadlist;
 };
 
