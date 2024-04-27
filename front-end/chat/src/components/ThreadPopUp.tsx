@@ -85,11 +85,16 @@ const ThreadPopUp = () => {
           <Button onClick={handleClose}>閉じる</Button>
           <Button
             onClick={(e) => {
-              handleClose();
               // CreateThread(userid,threaddata,e);
+              handleClose();
+              setThreadName("")
+              setCollections(0)
+              setLLMModel("gpt4")
+              setRelateNum(4)
+              setSearchMethod("default")
             }}
           >
-            決定
+            作成
           </Button>
         </DialogActions>
       </Dialog>

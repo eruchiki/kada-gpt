@@ -1,46 +1,54 @@
-// "use client";
-// import React from "react";
-// import { useState } from "react";
+"use client";
 
-// const PdfForm = () => {
-//   const [files, setFiles] = useState([]);
+import React, { useState } from "react";
+import FilePropsType from "../types/FileProps";
+import { Button } from "@mui/material";
+import { MuiFileInput } from "mui-file-input";
 
-//   const handleDrop = (e) => {
-//     e.preventDefault();
-//     const newFiles = [...e.dataTransfer.files];
-//     setFiles([...files, ...newFiles]);
-//   };
+const PdfForm = (props: FilePropsType) => {
+  // const [files, setFiles] = useState<File[]>([]);
+  const handleDrop = (e: any) => {
+    e.preventDefault();
+    const newFiles = [...e.dataTransfer.files];
+    props.setData([...props.fileList, ...newFiles]);
+  };
 
-//   const handleFileChange = (e) => {
-//     const newFiles = [...e.target.files];
-//     setFiles([...files, ...newFiles]);
-//   };
+  const handleFileChange = (newFiles: File) => {
+    props.setData([...props.fileList, newFiles]);
+  };
 
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     // ファイルのアップロード処理を行う
-//     console.log(files);
-//   };
+  const handleCancel = (index: number) => {
+    const updatedFiles = props.fileList.filter((_, i) => i !== index);
+    props.setData(updatedFiles);
+  };
 
-//   return (
-//     <div>
-//       <h1>PDF ファイルをアップロード</h1>
-//       <form
-//         onSubmit={handleSubmit}
-//         onDrop={handleDrop}
-//         encType="multipart/form-data"
-//       >
-//         <input type="file" multiple accept=".pdf" onChange={handleFileChange} />
-//         <button type="submit">アップロード</button>
-//       </form>
-//       <ul>
-//         {files.map((file, index) => (
-//           <li key={index}>{file.name}</li>  
-//         ))}
-//       </ul>
-//     </div>
-//   );
-// }
+  return (
+    <div>
+      <h1>PDF ファイルをアップロード</h1>
+      <MuiFileInput
+        onDrop={handleDrop}
+        value={props.fileList}
+        onChange={handleFileChange}
+        helperText="PDFを選択して下さい"
+      />
+      {/* <form
+        onSubmit={handleSubmit}
+        onDrop={handleDrop}
+        encType="multipart/form-data"
+      >
+        <input type="file" multiple accept=".pdf" onChange={handleFileChange} />
+        <button type="submit">アップロード</button>
+      </form> */}
+      <ul>
+        {props.fileList.map((file, index) => (
+          <li key={index}>
+            {file.name}
+            <Button onClick={() => handleCancel(index)}>キャンセル</Button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
-
-// export default PdfForm
+export default PdfForm;

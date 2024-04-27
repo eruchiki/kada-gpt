@@ -1,9 +1,13 @@
 import axios from "axios";
 
-const GetThreadList = (userid: string) => {
-  const url = `${process.env.HOST_URL}/chat/${userid}/thread`;
-  const threadlist = axios.get(url);
-  return threadlist;
-};
+const GetThreadList = async (userid: string) => {
+  const url = `http://localhost:8080/chat/users/${userid}/thread`;
+    return await axios.get(url).then(response => {
+      return response.data
+    }).catch(error => {
+        // 失敗時の処理etc
+        return error
+    })
+}
 
 export default GetThreadList;

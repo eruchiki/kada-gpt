@@ -2,6 +2,7 @@ import React from "react";
 import { List, Link, ListItem,  ListItemButton, ListItemIcon } from "@mui/material";
 import ThreadsPropsType from "../types/ThreadProps";
 import ThreadPopup from "./ThreadPopUp"
+import PDFPopUp from "./PDFPopUp"
 
 
 const SideMenuList: React.FC<{ threadlist: ThreadsPropsType[] }> = ({
@@ -16,15 +17,9 @@ const SideMenuList: React.FC<{ threadlist: ThreadsPropsType[] }> = ({
           {/* <ListItemButton onClick={}> */}
           <ListItemButton>
             <ThreadPopup />
-            {/* <ListItemIcon>
-              <AddIcon />
-            </ListItemIcon> */}
-            {/* <Link
-              href={`${process.env.NEXT_PUBLIC_ROOTPATH}/thread/${thread.id}`}
-              key={thread.name}
-              underline="none"
-            >
-            </Link> */}
+          </ListItemButton>
+          <ListItemButton>
+            <PDFPopUp />
           </ListItemButton>
         </ListItem>
         {threadlist.map((thread) => (

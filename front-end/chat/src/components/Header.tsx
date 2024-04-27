@@ -1,5 +1,6 @@
 "use client";
 
+import { useSession } from "next-auth/react"
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -8,12 +9,28 @@ import Login from './Login';
 import MenuButton from './MenuButton';
 import ThreadsPropsType from '../types/ThreadProps';
 import PersistentDrawerLeft from './PersistentDrawerLeft';
+import GetThreadList from "@/app/api/GetThreadList";
 
 
-const Header: React.FC<{ threadlist: ThreadsPropsType[] }> = ({
-  threadlist,
-}) => {
+const Header = () => {
   const [open, setOpen] = React.useState(false);
+  const [ThreadList, setThreadList] = React.useState<ThreadsPropsType[]>([]);
+  const { data: session, status } = useSession()
+
+  React.useEffect(() => {
+    if (session) {
+      // const threadlist = [
+      //   { id: 1, name: "test1" },
+      //   { id: 2, name: "test2" },
+      // ];
+      const AxiosFunction = async () => {
+        const threadlist = await GetThreadList(session?.user?.email);
+        console.log(threadlist);
+        setThreadList(threadlist);
+      };
+      AxiosFunction();
+    }
+  }, [session]);
   return (
     <div style={{ width: "100%" }}>
       <AppBar position="static">
@@ -28,7 +45,7 @@ const Header: React.FC<{ threadlist: ThreadsPropsType[] }> = ({
       <PersistentDrawerLeft
         open={open}
         setOpen={setOpen}
-        threadlist={threadlist}
+        threadlist={ThreadList}
       />
     </div>
   );

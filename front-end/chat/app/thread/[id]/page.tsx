@@ -3,7 +3,6 @@ import Chat from '@/src/components/Chat/Chat';
 import ThreadInfoPropsType from '@/src/types/ThreadInfoProps';
 
 export default function ThreadPage() {
-  const threadlist = [{"id":1,"name":"test1"},{"id":2,"name":"test2"}]
   const ThreadInfo: ThreadInfoPropsType = {
     id: 1,
     name: "test",
@@ -17,7 +16,7 @@ export default function ThreadPage() {
   
   return (
     <>
-      <Header threadlist={threadlist}></Header>
+      <Header></Header>
       <Chat ThreadData={ThreadInfo} />
     </>
   );
