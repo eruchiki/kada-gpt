@@ -5,6 +5,11 @@ services:
       dockerfile: Dockerfile.dev
       args:
         NEXT_START_OPTION: ${NEXT_START_OPTION}
+    # command: >
+    #   /bin/sh -c '
+    #   yarn build &&
+    #   yarn start -H 0.0.0.0
+    #   '
     container_name: app
     volumes:
       - app-vscode-server:/app/.vscode-server
