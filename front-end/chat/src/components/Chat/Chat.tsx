@@ -1,173 +1,98 @@
 "use client";
 
-import {useState} from 'react';
+import { useState, useEffect } from "react";
 import PromptInput from "../PromptInput/PromptInput";
 import './Chat.css';
+import GetThread from "@/app/api/GetThread";
 import GetChatHisotry from '@/app/api/GetChatHistory';
 import SendMessage from "@/app/api/SendMessage";
 import ChatHisotryPropsType from '@/src/types/ChatHistoryTypes';
 import ThreadInfoPropsType from "../../types/ThreadInfoProps";
 import PromptResponseList from "../PromptResponseList/PromptResponseList";
+import ChatPramasPropsType from "../../types/ChatParmsProps"
 
 
-const Chat: React.FC<{ ThreadData: ThreadInfoPropsType }> = ({
-  ThreadData,
-}) => {
+// const Chat: React.FC<{ ThreadData: ThreadInfoPropsType }> = ({
+const Chat = (props:ChatPramasPropsType) => {
   // const [responseList, setResponseList] = useState<ChatHisotryPropsType[]>([]);
   const [prompt, setPrompt] = useState<string>("");
-  // const [promptToRetry, setPromptToRetry] = useState<string | null>(null);
-  // const [uniqueIdToRetry, setUniqueIdToRetry] = useState<string | null>(null);
-  // const [modelValue, setModelValue] = useState<ModelValueType>('gpt');
-  // const [isLoading, setIsLoading] = useState(false);
-  // let loadInterval: number | undefined;
+  const [ChatHistory, setChatHistory] = useState<ChatHisotryPropsType[]>([]);
+  const [ThreadInfo, setThreadInfo] = useState<ThreadInfoPropsType>({
+    id: -1,
+    name: "",
+    model_name: "",
+    relate_num: 4,
+    collections_id: -1,
+    search_method: "",
+    create_user_id: -1,
+    group_id: 2,
+  });
+  // const [responseList, setResponseList] = useState<ChatHisotryPropsType[]>([]);
 
-  // const generateUniqueId = () => {
-  //   const timestamp = Date.now();
-  //   const randomNumber = Math.random();
-  //   const hexadecimalString = randomNumber.toString(16);
-
-  //   return `id-${timestamp}-${hexadecimalString}`;
-  // }
-
-  // const htmlToText = (html: string) => {
-  //   const temp = document.createElement('div');
-  //   temp.innerHTML = html;
-  //   return temp.textContent;
-  // }
-
-  // const delay = (ms: number) => {
-  //   return new Promise( resolve => setTimeout(resolve, ms) );
-  // }
-
-  // const addLoader = (uid: string) => {
-  //   const element = document.getElementById(uid) as HTMLElement;
-  //   element.textContent = ''
-
-  //   // @ts-ignore
-  //   loadInterval = setInterval(() => {
-  //     // Update the text content of the loading indicator
-  //     element.textContent += '.';
-
-  //     // If the loading indicator has reached three dots, reset it
-  //     if (element.textContent === '....') {
-  //       element.textContent = '';
-  //     }
-  //   }, 300);
-  // }
-
-  // const addResponse = (selfFlag: boolean, response?: string) => {
-  //   const uid = generateUniqueId()
-  //   setResponseList(prevResponses => [
-  //     ...prevResponses,
-  //     {
-  //       id: uid,
-  //       response,
-  //       selfFlag
-  //     },
-  //   ]);
-  //   return uid;
-  // }
-
-  // const updateResponse = (uid: string, updatedObject: Record<string, unknown>) => {
-  //   setResponseList(prevResponses => {
-  //     const updatedList = [...prevResponses]
-  //     const index = prevResponses.findIndex((response) => response.id === uid);
-  //     if (index > -1) {
-  //       updatedList[index] = {
-  //         ...updatedList[index],
-  //         ...updatedObject
-  //       }
-  //     }
-  //     return updatedList;
-  //   });
-  // }
-
-  // const regenerateResponse = async () => {
-  //   await getGPTResult(promptToRetry, uniqueIdToRetry);
-  // }
-
-  // const getGPTResult = async (_promptToRetry?: string | null, _uniqueIdToRetry?: string | null) => {
-  //   // Get the prompt input
-  //   const _prompt = _promptToRetry ?? htmlToText(prompt);
-
-  //   // If a response is already being generated or the prompt is empty, return
-  //   if (isLoading || !_prompt) {
-  //     return;
-  //   }
-
-  //   setIsLoading(true);
-
-  //   // Clear the prompt input
-  //   setPrompt('');
-
-  //   let uniqueId: string;
-  //   if (_uniqueIdToRetry) {
-  //     uniqueId = _uniqueIdToRetry;
-  //   } else {
-  //     // Add the self prompt to the response list
-  //     addResponse(true, _prompt);
-  //     uniqueId = addResponse(false);
-  //     await delay(50);
-  //     addLoader(uniqueId);
-  //   }
-
-  //   // API部分
-  //   try {
-  //     // Send a POST request to the API with the prompt in the request body
-  //     const response = await axios.post('get-prompt-result', {
-  //       prompt: _prompt,
-  //       model: modelValue
-  //     });
-  //       updateResponse(uniqueId, {
-  //         response: response.data.trim(),
-  //     });
-
-  //     setPromptToRetry(null);
-  //     setUniqueIdToRetry(null);
-  //   } catch (err) {
-  //     setPromptToRetry(_prompt);
-  //     setUniqueIdToRetry(uniqueId);
-  //     updateResponse(uniqueId, {
-  //       // @ts-ignore
-  //       response: `Error: ${err.message}`,
-  //       error: true
-  //     });
-  //   } finally {
-  //     // Clear the loader interval
-  //     clearInterval(loadInterval);
-  //     setIsLoading(false);
-  //   }
-  // }
-  
-  // const responseList = GetChatHisotry(ThreadData.create_user_id,ThreadData.id);
-  const responseList: ChatHisotryPropsType[] = [
-    {
-      id: 1,
-      message_text: "hello",
-      response_text: "hello",
-      referances: ["a", "b", "c"],
-      created_at: "1",
-      update_at: "1",
-      relate_num: 4,
-      search_method: "default",
-      model_name: "gpt3",
-    },
-    {
-      id: 1,
-      message_text: "こんにちは",
-      response_text: "元気です",
-      referances: ["a", "b", "c"],
-      created_at: "1",
-      update_at: "1",
-      relate_num: 4,
-      search_method: "default",
-      model_name: "gpt3",
-    },
-  ];
+  useEffect(() => {
+    const AxiosFunction = async () => {
+      if (props.SessionUser) {
+        const ThreadInfo = await GetThread(
+          props.SessionUser.email,
+          props.ThreadId
+        );
+        const chathisotry = await GetChatHisotry(
+          props.SessionUser.email,
+          ThreadInfo.id
+        );
+        setThreadInfo(ThreadInfo);
+        setChatHistory(chathisotry);
+      }
+    };
+    AxiosFunction();
+  }, [props.SessionUser]);
+  console.log(ChatHistory);
+  const ChatFunction = async () => {
+    await SendMessage({
+      create_user_id: ThreadInfo.create_user_id,
+      thread_id: ThreadInfo.id,
+      collection_id: ThreadInfo.collections_id,
+      relate_num: ThreadInfo.relate_num,
+      search_method: ThreadInfo.search_method,
+      model_name: ThreadInfo.model_name,
+      message_text: prompt,
+    });
+    const chathisotry = await GetChatHisotry(
+      props.SessionUser.email,
+      ThreadInfo.id
+    );
+    setChatHistory(chathisotry);
+  };
+  console.log(ThreadInfo);
+  // console.log(ThreadInfo)
+  // const responseList: ChatHisotryPropsType[] = [
+  //   {
+  //     id: 1,
+  //     message_text: "hello",
+  //     response_text: "hello",
+  //     referances: ["a", "b", "c"],
+  //     created_at: "1",
+  //     update_at: "1",
+  //     relate_num: 4,
+  //     search_method: "default",
+  //     model_name: "gpt3",
+  //   },
+  //   {
+  //     id: 1,
+  //     message_text: "こんにちは",
+  //     response_text: "元気です",
+  //     referances: ["a", "b", "c"],
+  //     created_at: "1",
+  //     update_at: "1",
+  //     relate_num: 4,
+  //     search_method: "default",
+  //     model_name: "gpt3",
+  //   },
+  // ];
   return (
     <div className="App">
       <div id="response-list">
-        <PromptResponseList responseList={responseList} key="response-list" />
+        <PromptResponseList responseList={ChatHistory} key="response-list" />
       </div>
       {/* { uniqueIdToRetry &&
         (<div id="regenerate-button-container">
@@ -188,34 +113,14 @@ const Chat: React.FC<{ ThreadData: ThreadInfoPropsType }> = ({
       <div id="input-container">
         <PromptInput
           prompt={prompt}
-          onSubmit={() =>
-            SendMessage({
-              create_user_id: ThreadData.create_user_id,
-              thread_id: ThreadData.id,
-              collection_id: ThreadData.collections_id,
-              relate_num: ThreadData.relate_num,
-              search_method: ThreadData.search_method,
-              model_name: ThreadData.model_name,
-              message_text: prompt,
-            })
-          }
+          onSubmit={() => ChatFunction()}
           key="prompt-input"
           updatePrompt={(prompt) => setPrompt(prompt)}
         />
         <button
           id="submit-button"
           // className={isLoading ? "loading" : ""}
-          onClick={() =>
-            SendMessage({
-              create_user_id: ThreadData.create_user_id,
-              thread_id: ThreadData.id,
-              collection_id: ThreadData.collections_id,
-              relate_num: ThreadData.relate_num,
-              search_method: ThreadData.search_method,
-              model_name: ThreadData.model_name,
-              message_text: prompt,
-            })
-          }
+          onClick={() => ChatFunction}
         ></button>
       </div>
     </div>

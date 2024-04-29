@@ -1,9 +1,15 @@
 import axios from "axios";
 
 const GetUser = async (userid: string) => {
-  const url = `${process.env.API_URL}/chat/users/${userid}`;
-  const userlist = await axios.get(url);
-  console.log(userlist)
-  return userlist.data.result
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/chat/users/${userid}`;
+  return await axios
+    .get(url)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      // 失敗時の処理etc
+      return error;
+    });
 }
 export default GetUser;

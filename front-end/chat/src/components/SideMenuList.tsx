@@ -5,9 +5,11 @@ import ThreadPopup from "./ThreadPopUp"
 import PDFPopUp from "./PDFPopUp"
 
 
-const SideMenuList: React.FC<{ threadlist: ThreadsPropsType[] }> = ({
-  threadlist,
-}) => {
+const SideMenuList: React.FC<{
+  threadlist: ThreadsPropsType[];
+  userid: string;
+}> = ({ threadlist, userid}) => {
+  console.log(userid);
   // const menulist = ["仕事","新規作成"]
   // const menupath = [`${process.env.NEXT_PUBLIC_ROOTPATH}/thread/1`,`${process.env.NEXT_PUBLIC_ROOTPATH}/thread/2`]
   return (
@@ -16,10 +18,10 @@ const SideMenuList: React.FC<{ threadlist: ThreadsPropsType[] }> = ({
         <ListItem key="threadcreate" disablePadding>
           {/* <ListItemButton onClick={}> */}
           <ListItemButton>
-            <ThreadPopup />
+            <ThreadPopup userid={userid} />
           </ListItemButton>
           <ListItemButton>
-            <PDFPopUp />
+            <PDFPopUp userid={userid} />
           </ListItemButton>
         </ListItem>
         {threadlist.map((thread) => (

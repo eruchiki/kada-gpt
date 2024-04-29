@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const GetChatHistory = async (userid: string, threadid: number) => {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/chat/users/${userid}/thread/${threadid}/history`;
+const GetThread = async (userid: string, threadid:string) => {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/chat/users/${userid}/thread/${threadid}`;
   return await axios
     .get(url)
     .then((response) => {
@@ -13,4 +13,4 @@ const GetChatHistory = async (userid: string, threadid: number) => {
     });
 };
 
-export default GetChatHistory;
+export default GetThread;

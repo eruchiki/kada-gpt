@@ -1,7 +1,6 @@
 "use client";
 
 // import { getServerSession } from "next-auth";
-import { useSession } from "next-auth/react"
 import { signIn } from 'next-auth/react'
 import Button from '@mui/material/Button'
 import {useState} from 'react'
@@ -10,8 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import UserMenu from './UserMenu';
 
 
-const LoginButton = () => {
-  const { data: session, status } = useSession()
+const LoginButton = (session:any) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {

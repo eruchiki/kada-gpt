@@ -9,11 +9,13 @@ const PdfForm = (props: FilePropsType) => {
   // const [files, setFiles] = useState<File[]>([]);
   const handleDrop = (e: any) => {
     e.preventDefault();
+    const mime_type = "application/pdf";
     const newFiles = [...e.dataTransfer.files];
-    props.setData([...props.fileList, ...newFiles]);
+    props.setData([...props.fileList,...newFiles]);
   };
 
   const handleFileChange = (newFiles: File) => {
+    const mime_type = "application/pdf";
     props.setData([...props.fileList, newFiles]);
   };
 

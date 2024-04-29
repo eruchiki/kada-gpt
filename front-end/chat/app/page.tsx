@@ -1,11 +1,14 @@
 import Header from "@/src/components/Header";
-import { useSession } from "next-auth/react";
+import { getServerSession } from "next-auth/next";
+import { NextApiRequest, NextApiResponse } from "next";
+import { authOptions } from "./lib/next-auth/options";
 
-
-export default function Page() {
+export default async function Page() {
+  const session = await getServerSession(authOptions);
+  const user = session?.user;
   return (
     <>
-      <Header></Header>
+      <Header SessionUser={user}></Header>
     </>
   );
 }

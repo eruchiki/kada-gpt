@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const GetThreadList = async (userid: string) => {
-  const url = `http://localhost:8080/chat/users/${userid}/thread`;
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/chat/users/${userid}/thread`;
     return await axios.get(url).then(response => {
       return response.data
     }).catch(error => {
