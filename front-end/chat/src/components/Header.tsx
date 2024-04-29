@@ -7,25 +7,23 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import LoginButton from './Login';
 import MenuButton from './MenuButton';
-import ThreadsPropsType from '../types/ThreadProps';
 import PersistentDrawerLeft from './PersistentDrawerLeft';
-import GetThreadList from "@/app/api/GetThreadList";
-import SessionPropsType from "../types/SessionProps"
+import HeaderPropsType from '../types/HeaderProps';
 
 
-const Header = (props: SessionPropsType) => {
-  const [open, setOpen] = React.useState(false);
-  const [ThreadList, setThreadList] = React.useState<ThreadsPropsType[]>([]);
-  React.useEffect(() => {
-    const AxiosFunction = async () => {
-      if (props.SessionUser) {
-        const threadlist = await GetThreadList(props.SessionUser?.id);
-        setThreadList(threadlist);
-      }
-    };
-    AxiosFunction();
-  }, [props.SessionUser]);
-  console.log(ThreadList);
+const Header = (props:  HeaderPropsType) => {
+  const [open, setOpen] = React.useState(false); 
+  // const [ThreadList, setThreadList] = React.useState<ThreadsPropsType[]>([]);
+  // React.useEffect(() => {
+  //   const AxiosFunction = async () => {
+  //     if (props.SessionUser) {
+  //       const threadlist = await GetThreadList(props.SessionUser?.id);
+  //       setThreadList(threadlist);
+  //     }
+  //   };
+  //   AxiosFunction();
+  // }, [props.SessionUser]);
+  // console.log(ThreadList);
   return (
     <div style={{ width: "100%" }}>
       <AppBar position="static">
@@ -41,7 +39,7 @@ const Header = (props: SessionPropsType) => {
         <PersistentDrawerLeft
           open={open}
           setOpen={setOpen}
-          threadlist={ThreadList}
+          threadlist={props.ThreadList}
           userid={props.SessionUser?.id}
         />
       )}
