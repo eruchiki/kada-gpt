@@ -29,7 +29,7 @@ docker compose up -d
 ## 初期設定
 api側のグループとUserを作成しておく．  
 またapi側のUserと同一のnameを持つKeycloakアカウントを用意する．  
-keycloakへのアクセスはまず[https://localhost:8081/admin/master/console/#/KadaGPT/users](https://localhost:8081/admin/master/console/#/KadaGPT/users)にアクセスし，`Add user`からユーザ追加する．  
+keycloakへのアクセスはまず[http://localhost:8081/admin/master/console/#/KadaGPT/users](http://localhost:8081/admin/master/console/#/KadaGPT/users)にアクセスし，`admin`，`hogehoge`でログイン，`Add user`からユーザ追加する．  
 ユーザ名，メアド，氏名を入力して保存した後，その画面のまま`Credetials`タブに移動し，パスワードを追加する．
 `Temporary`オプションはoffにしたほうが良い．
 
