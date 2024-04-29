@@ -9,31 +9,38 @@ import IconButton from '@mui/material/IconButton';
 import UserMenu from './UserMenu';
 
 
-const LoginButton = (session:any) => {
+const LoginButton = (props: any) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
       setAnchorEl(event.currentTarget);
   };
     return (
-        <>
-          {session && (
-            <>
+      <>
+        {props.SessionUser && (
+          <>
             <IconButton
-            aria-controls={open ? 'basic-menu' : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? 'true' : undefined}
-            onClick={handleClick}>
-            <PersonIcon/>
+              aria-controls={open ? "basic-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? "true" : undefined}
+              onClick={handleClick}
+            >
+              <PersonIcon />
             </IconButton>
-            <UserMenu open={open} setAnchorEl={setAnchorEl} anchorEl={anchorEl}/> 
-            </>
-          )}
-          {!session && (
-            <Button color='inherit' onClick={() => signIn()}>Login</Button>
-          )}
-        </>
-      )
+            <UserMenu
+              open={open}
+              setAnchorEl={setAnchorEl}
+              anchorEl={anchorEl}
+            />
+          </>
+        )}
+        {!props.SessionUser && (
+          <Button color="inherit" onClick={() => signIn()}>
+            Login
+          </Button>
+        )}
+      </>
+    );
 }
 
 export default LoginButton

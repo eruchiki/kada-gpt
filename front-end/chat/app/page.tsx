@@ -5,6 +5,7 @@ import { authOptions } from "./lib/next-auth/options";
 
 export default async function Page() {
   const session = await getServerSession(authOptions);
+  console.log(session);
   const user = session?.user;
   return (
     <>

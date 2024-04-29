@@ -19,7 +19,7 @@ class Users(Base):
     id = Column(Integer, primary_key=True)
     group_id = Column(Integer, ForeignKey("groups.id"))
     email = Column(String(500))
-    name = Column(String(1024))
+    name = Column(String(1024), nullable=False, unique=True)
     password = Column(String(1024))
     is_admin = Column(Boolean, default=False)
     created_at = Column(
@@ -41,7 +41,7 @@ class Groups(Base):
     __tablename__ = "groups"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(1024))
+    name = Column(String(1024), nullable=False, unique=True)
     created_at = Column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

@@ -27,10 +27,11 @@ ENV NEXT_TELEMETRY_DISABLED=$NEXT_TELEMETRY_DISABLED
 
 # Note: Don't expose ports here, Compose will handle that for us
 
+ARG NEXT_START_OPTION=
 # Start Next.js in development mode based on the preferred package manager
 CMD \
-  if [ -f yarn.lock ]; then yarn dev; \
-  elif [ -f package-lock.json ]; then npm run dev; \
-  elif [ -f pnpm-lock.yaml ]; then pnpm dev; \
-  else npm run dev; \
+  if [ -f yarn.lock ]; then yarn dev ${NEXT_START_OPTION}; \
+  elif [ -f package-lock.json ]; then npm run dev ${NEXT_START_OPTION}; \
+  elif [ -f pnpm-lock.yaml ]; then pnpm dev ${NEXT_START_OPTION}; \
+  else npm run dev ${NEXT_START_OPTION}; \
   fi
