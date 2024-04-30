@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const GetChatHistory = async (userid: string, threadid: number) => {
+const GetChatHistory = async (userid: number, threadid: number) => {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/chat/users/${userid}/thread/${threadid}/history`;
   return await axios
     .get(url)

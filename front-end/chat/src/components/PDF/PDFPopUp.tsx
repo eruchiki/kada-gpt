@@ -2,10 +2,10 @@
 
 import React, { useState } from "react";
 import { Dialog, Button, DialogTitle, DialogActions, Box } from "@mui/material";
-import GetCollectionList from "@/app/api/GetCollectionList";
-import DocumentAdd from "../../app/api/DocumentAdd";
+import GetCollectionList from "../../../app/api/GetCollectionList";
+import DocumentAdd from "../../../app/api/DocumentAdd";
 import PDFForm from "./PdfForm"
-import SelectForm from "./SelectForm";
+import SelectForm from "../SelectForm";
 import AddIcon from "@mui/icons-material/Add";
 
 const PDFPopUp = (userid: string) => {

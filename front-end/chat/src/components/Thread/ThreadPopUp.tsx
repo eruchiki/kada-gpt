@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { Dialog, Button, DialogTitle, DialogActions, Box } from "@mui/material";
-import CreateThread from "../../app/api/CreateThread";
-import GetCollectionList from "@/app/api/GetCollectionList";
-import TextForm from "./TextForm";
-import SelectForm from "./SelectForm";
-import GetUser from "@/app/api/GetUser";
+import CreateThread from "../../../app/api/CreateThread";
+import GetCollectionList from "../../..//app/api/GetCollectionList";
+import TextForm from "../TextForm";
+import SelectForm from "../SelectForm";
+import GetUser from "../../../app/api/GetUser";
 import AddIcon from "@mui/icons-material/Add";
+import ThreadButton from "./ThreadButton";
 
 
 const ThreadPopUp = (userid: string) => {
@@ -51,19 +52,7 @@ const ThreadPopUp = (userid: string) => {
      };
      AxiosFunction();
    }, []);
-  // const CollectionList = [
-  //   { id: 1, name: "test1" },
-  //   { id: 2, name: "test2" },
-  // ];
-  console.log({
-    name: ThreadName,
-    model_name: LLMModel,
-    relate_num: RelateNum,
-    collections_id: Collections,
-    search_method: SearchMethod,
-    create_user_id: parseInt(userid.userid),
-    group_id: GroupId,
-  });
+
   const SearchMethodList = [
     { id: "default", name: "default" },
     { id: "select", name: "select" },
@@ -112,31 +101,20 @@ const ThreadPopUp = (userid: string) => {
         </Box>
         <DialogActions>
           <Button onClick={handleClose}>閉じる</Button>
-          <Button
-            onClick={(e) => {
-              CreateThread(
-                userid.userid,
-                {
-                  name: ThreadName,
-                  model_name: LLMModel,
-                  relate_num: RelateNum,
-                  collections_id: Collections,
-                  search_method: SearchMethod,
-                  create_user_id: parseInt(userid.userid),
-                  group_id: GroupId,
-                },
-                e
-              );
-              handleClose();
-              // setThreadName("")
-              // setCollections(0)
-              // setLLMModel("gpt4")
-              // setRelateNum(4)
-              // setSearchMethod("default")
+          <ThreadButton
+            userid={userid.userid}
+            ThreadInfo={{
+              name: ThreadName,
+              model_name: LLMModel,
+              relate_num: RelateNum,
+              collections_id: Collections,
+              search_method: SearchMethod,
+              create_user_id: parseInt(userid.userid),
+              group_id: GroupId,
             }}
           >
             作成
-          </Button>
+          </ThreadButton>
         </DialogActions>
       </Dialog>
     </div>

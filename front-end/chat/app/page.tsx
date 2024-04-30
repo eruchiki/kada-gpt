@@ -2,7 +2,6 @@ import Header from "@/src/components/Header";
 import { getServerSession } from "next-auth/next";
 import GetThreadList from "./api/GetThreadList";
 import { authOptions } from "./lib/next-auth/options";
-import { Session } from "inspector";
 
 
 type SessionUser<T> = T & {
