@@ -1,36 +1,65 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Dialog, Button, DialogTitle, DialogActions, Box } from "@mui/material";
-import CreateThread from "../../../app/api/CreateThread";
-import GetCollectionList from "../../..//app/api/GetCollectionList";
 import TextForm from "../TextForm";
 import SelectForm from "../SelectForm";
-import GetUser from "../../../app/api/GetUser";
 import AddIcon from "@mui/icons-material/Add";
-import ThreadButton from "./ThreadButton";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
+type ThreadPopUpPropsType = {
+  userid: number;
+  collectionlist: Array<any>;
+  groupid: number;
+};
 
-const ThreadPopUp = (userid: string) => {
-  // console.log(userid)
+const CreateThread = async (ThreadInfo: any, event: any) => {
+  event.preventDefault();
+  const url = `api/thread`;
+  return await axios
+    .post(url, ThreadInfo)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      // 失敗時の処理etc
+      return error;
+    });
+};
+
+const ThreadPopUp = (props: ThreadPopUpPropsType) => {
+  const router = useRouter();
   // console.log(typeof userid.userid);
   const [open, setOpen] = React.useState(false);
-  const [CollectionList, setCollectionList] = React.useState([]);
   const [ThreadName, setThreadName] = React.useState<string>("");
   const [LLMModel, setLLMModel] = React.useState<string>("gpt4");
   const [Collections, setCollections] = React.useState<number>(0);
   const [RelateNum, setRelateNum] = React.useState<number>(4);
   const [SearchMethod, setSearchMethod] = React.useState<string>("default");
-  const [GroupId, setGroupId] = React.useState<number>()
   const handleClickOpen = () => {
     setOpen(true);
   };
   const handleClose = () => {
     setOpen(false);
   };
+  const handleCreate = async (ThreadInfo: any, event: any) => {
+    const CreateData = await CreateThread(
+               ThreadInfo,
+                event
+    );
+    console.log(CreateData)
+    handleClose();
+    setThreadName("")
+    setCollections(0)
+    setLLMModel("gpt4")
+    setRelateNum(4)
+    setSearchMethod("default")
+    router.push(`/thread/${CreateData.id}`);
+  }
   const LLMModelList = [
-    { id: "gpt3", name: "gpt3" },
-    { id: "gpt4", name: "gpt4" },
+    { id: "gpt-3.5-turbo", name: "gpt3" },
+    { id: "gpt-4-turbo", name: "gpt4" },
   ];
   const RelateNumList = [
     { id: 1, name: 1 },
@@ -39,19 +68,6 @@ const ThreadPopUp = (userid: string) => {
     { id: 4, name: 4 },
     { id: 5, name: 5 },
   ];
-   React.useEffect(() => {
-     const AxiosFunction = async () => {
-       const CollectionList = await GetCollectionList();
-       const UserInfo = await GetUser(userid.userid)
-       setGroupId(UserInfo.group_id)
-       setCollectionList(
-         CollectionList.map((d) => {
-           return { id: d.id, name: d.name };
-         })
-       );
-     };
-     AxiosFunction();
-   }, []);
 
   const SearchMethodList = [
     { id: "default", name: "default" },
@@ -87,7 +103,7 @@ const ThreadPopUp = (userid: string) => {
           <SelectForm
             label="コレクション（ベクトルDB）"
             data={Collections}
-            DataList={CollectionList}
+            DataList={props.collectionlist}
             setData={setCollections}
           />
         </Box>
@@ -101,20 +117,21 @@ const ThreadPopUp = (userid: string) => {
         </Box>
         <DialogActions>
           <Button onClick={handleClose}>閉じる</Button>
-          <ThreadButton
-            userid={userid.userid}
-            ThreadInfo={{
-              name: ThreadName,
-              model_name: LLMModel,
-              relate_num: RelateNum,
-              collections_id: Collections,
-              search_method: SearchMethod,
-              create_user_id: parseInt(userid.userid),
-              group_id: GroupId,
+          <Button
+            onClick={(e) => {handleCreate({
+                  name: ThreadName,
+                  model_name: LLMModel,
+                  relate_num: RelateNum,
+                  collections_id: Collections,
+                  search_method: SearchMethod,
+                  create_user_id: props.userid,
+                  group_id: props.groupid,
+                },
+                e)
             }}
           >
             作成
-          </ThreadButton>
+          </Button>
         </DialogActions>
       </Dialog>
     </div>

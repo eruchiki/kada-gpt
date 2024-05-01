@@ -8,13 +8,28 @@ import PromptResponseList from "../PromptResponseList/PromptResponseList";
 import ChatPramasPropsType from "../../types/ChatParmsProps";
 import SendButton from "./SendButton";
 import ChatFunction from "../../../app/api/ChatAPI";
+import ChatPropsType from "@/src/types/ChatProps";
+import axios from "axios";
+
+const SendMessage = async (Props: ChatPropsType) => {
+  const url = `api/chat`;
+  const response =  await axios
+    .post(url, {prompt:Props.prompt,ThreadInfo:Props.ThreadInfo,userid:Props.userid})
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      // 失敗時の処理etc
+      return error;
+    })
+  Props.setData(response.data);
+};
 
 const Chat = (props: ChatPramasPropsType) => {
   const [prompt, setPrompt] = useState<string>("");
   const [ChatHistory, setChatHistory] = useState<ChatHisotryPropsType[]>(
     props.ChatHistory
   );
-
   return (
     <div className="App">
       <div id="response-list">
@@ -26,7 +41,7 @@ const Chat = (props: ChatPramasPropsType) => {
         <PromptInput
           prompt={prompt}
           onSubmit={() =>
-            ChatFunction({
+            SendMessage({
               setData: setChatHistory,
               prompt,
               ThreadInfo: props.ThreadInfo,
@@ -36,12 +51,18 @@ const Chat = (props: ChatPramasPropsType) => {
           key="prompt-input"
           updatePrompt={(prompt) => setPrompt(prompt)}
         />
-        <SendButton
-          setData={setChatHistory}
-          prompt={prompt}
-          ThreadInfo={props.ThreadInfo}
-          userid={props.SessionUser.id}
-        />
+        <button
+          id="submit-button"
+          // className={isLoading ? "loading" : ""}
+          onClick={() =>
+            SendMessage({
+              setData: setChatHistory,
+              prompt,
+              ThreadInfo: props.ThreadInfo,
+              userid: props.SessionUser.id,
+            })
+          }
+        ></button>
       </div>
     </div>
   );

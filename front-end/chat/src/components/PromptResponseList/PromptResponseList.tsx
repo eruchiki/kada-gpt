@@ -20,7 +20,7 @@ const PromptResponseList: FC<{ responseList: MessagePropsType[] }> = ({ response
   useEffect(() => {
     hljs.highlightAll();
   }, [responseList]);
-
+  console.log(responseList)
   return (
     <div className="prompt-response-list" ref={responseListRef}>
       {responseList.map((responseData) => (

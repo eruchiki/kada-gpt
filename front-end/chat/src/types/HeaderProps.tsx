@@ -7,8 +7,11 @@ type SessionUser = {
   image?: string | null | undefined;
   id?: string | null | undefined;
 };
+
+
 type HeaderPropsType = {
   SessionUser: SessionUser | undefined;
   ThreadList: ThreadsPropsType[] | any[];
+  PopUpData:{GroupId:number,CollectionList:any} | null
 };
 export default HeaderPropsType;

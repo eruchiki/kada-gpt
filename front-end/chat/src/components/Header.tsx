@@ -13,17 +13,6 @@ import HeaderPropsType from '../types/HeaderProps';
 
 const Header = (props:  HeaderPropsType) => {
   const [open, setOpen] = React.useState(false); 
-  // const [ThreadList, setThreadList] = React.useState<ThreadsPropsType[]>([]);
-  // React.useEffect(() => {
-  //   const AxiosFunction = async () => {
-  //     if (props.SessionUser) {
-  //       const threadlist = await GetThreadList(props.SessionUser?.id);
-  //       setThreadList(threadlist);
-  //     }
-  //   };
-  //   AxiosFunction();
-  // }, [props.SessionUser]);
-  // console.log(ThreadList);
   return (
     <div style={{ width: "100%" }}>
       <AppBar position="static">
@@ -41,6 +30,7 @@ const Header = (props:  HeaderPropsType) => {
           setOpen={setOpen}
           threadlist={props.ThreadList}
           userid={props.SessionUser?.id}
+          PopUpData={props.PopUpData}
         />
       )}
     </div>

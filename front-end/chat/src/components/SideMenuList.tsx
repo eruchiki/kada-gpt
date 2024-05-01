@@ -1,34 +1,42 @@
 import React from "react";
 import { List, Link, ListItem,  ListItemButton, ListItemIcon } from "@mui/material";
-import ThreadsPropsType from "../types/ThreadProps";
-import ThreadPopup from "./ThreadPopUp"
-import PDFPopUp from "./PDFPopUp"
+import ThreadPopup from "./Thread/ThreadPopUp"
+import PDFPopUp from "./PDF/PDFPopUp"
+import PopUpFunction from "../../app/api/PopUpAPI"
 
+type SideMenuPropsType = {
+  userid: number;
+  threadlist: Array<any>;
+  PopUpData: { GroupId: number; CollectionList: any } | null;
+};
 
-const SideMenuList: React.FC<{
-  threadlist: ThreadsPropsType[];
-  userid: string;
-}> = ({ threadlist, userid}) => {
-  console.log(userid);
-  // const menulist = ["仕事","新規作成"]
-  // const menupath = [`${process.env.NEXT_PUBLIC_ROOTPATH}/thread/1`,`${process.env.NEXT_PUBLIC_ROOTPATH}/thread/2`]
+const SideMenuList = (props: SideMenuPropsType) => {
   return (
     <>
       <List>
-        <ListItem key="threadcreate" disablePadding>
-          {/* <ListItemButton onClick={}> */}
-          <ListItemButton>
-            <ThreadPopup userid={userid} />
-          </ListItemButton>
-          <ListItemButton>
-            <PDFPopUp userid={userid} />
-          </ListItemButton>
-        </ListItem>
-        {threadlist.map((thread) => (
+        {props.PopUpData && (
+          <ListItem key="threadcreate" disablePadding>
+            {/* <ListItemButton onClick={}> */}
+            <ListItemButton>
+              <ThreadPopup
+                userid={props.userid}
+                collectionlist={props.PopUpData.CollectionList}
+                groupid={props.PopUpData.GroupId}
+              />
+            </ListItemButton>
+            <ListItemButton>
+              <PDFPopUp
+                userid={props.userid}
+                collectionlist={props.PopUpData.CollectionList}
+              />
+            </ListItemButton>
+          </ListItem>
+        )}
+        {props.threadlist.map((thread) => (
           <ListItem key={thread.name} disablePadding>
             <ListItemButton>
               <Link
-                href={`${process.env.NEXT_PUBLIC_ROOTPATH}/thread/${thread.id}`}
+                href={`${process.env.NEXTAUTH_URL}/thread/${thread.id}`}
                 key={thread.name}
                 underline="none"
               >
