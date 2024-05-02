@@ -60,7 +60,14 @@ const PDFPopUp = (props: PDFPopupPropsType) => {
           <Button onClick={handleClose}>閉じる</Button>
           <Button
             onClick={(e) => {
-              DocumentAdd(props.userid, Collections, PDFData, e);
+              DocumentAdd(
+                {
+                  userid: props.userid,
+                  Collections: Collections,
+                  PDFData: PDFData,
+                },
+                e
+              );
               handleClose();
               // setPDFData([]);
               // setCollections(0);
