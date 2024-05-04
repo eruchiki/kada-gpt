@@ -15,7 +15,7 @@ const Header = (props:  HeaderPropsType) => {
   const [open, setOpen] = React.useState(false); 
   return (
     <div style={{ width: "100%" }}>
-      <AppBar position="static">
+      <AppBar position="sticky">
         <Toolbar>
           <MenuButton open={open} setOpen={setOpen} />
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>

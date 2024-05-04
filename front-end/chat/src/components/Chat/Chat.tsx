@@ -6,8 +6,6 @@ import "./Chat.css";
 import ChatHisotryPropsType from "@/src/types/ChatHistoryTypes";
 import PromptResponseList from "../PromptResponseList/PromptResponseList";
 import ChatPramasPropsType from "../../types/ChatParmsProps";
-import SendButton from "./SendButton";
-import ChatFunction from "../../../app/api/ChatAPI";
 import ChatPropsType from "@/src/types/ChatProps";
 import axios from "axios";
 
@@ -23,6 +21,7 @@ const SendMessage = async (Props: ChatPropsType) => {
       return error;
     })
   Props.setData(response.data);
+  Props.setPrompt("");
 };
 
 const Chat = (props: ChatPramasPropsType) => {
@@ -43,6 +42,7 @@ const Chat = (props: ChatPramasPropsType) => {
           onSubmit={() =>
             SendMessage({
               setData: setChatHistory,
+              setPrompt: setPrompt,
               prompt,
               ThreadInfo: props.ThreadInfo,
               userid: props.SessionUser.id,
@@ -57,6 +57,7 @@ const Chat = (props: ChatPramasPropsType) => {
           onClick={() =>
             SendMessage({
               setData: setChatHistory,
+              setPrompt: setPrompt,
               prompt,
               ThreadInfo: props.ThreadInfo,
               userid: props.SessionUser.id,
