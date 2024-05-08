@@ -1,8 +1,10 @@
 import SessionPropsType from "./SessionProps";
+import ThreadInfoPropsType from "./ThreadInfoProps";
 
 
 type ChatParmsPropsType = {
   SessionUser: SessionPropsType;
-  ThreadId: string
+  ThreadInfo: ThreadInfoPropsType;
+  ChatHistory: any;
 };
 export default ChatParmsPropsType;

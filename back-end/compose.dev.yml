@@ -3,6 +3,7 @@ services:
     build:
       context: ./fastapi/
       dockerfile: Dockerfile
+    container_name: api
     volumes:
       - api-venv:/src/.venv
       - api-vscode:/src/.vscode-server

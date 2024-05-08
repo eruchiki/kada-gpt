@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import FilePropsType from "../types/FileProps";
+import FilePropsType from "../../types/FileProps";
 import { Button } from "@mui/material";
 import { MuiFileInput } from "mui-file-input";
 

@@ -1,34 +1,54 @@
 import React from "react";
 import { List, Link, ListItem,  ListItemButton, ListItemIcon } from "@mui/material";
-import ThreadsPropsType from "../types/ThreadProps";
-import ThreadPopup from "./ThreadPopUp"
-import PDFPopUp from "./PDFPopUp"
+import ThreadPopup from "./Thread/ThreadPopUp"
+import PDFPopUp from "./PDF/PDFPopUp"
+import Tooltip from "@mui/material/Tooltip";
 
+type SideMenuPropsType = {
+  userid: number;
+  threadlist: Array<any>;
+  PopUpData: { GroupId: number; CollectionList: any } | null;
+};
 
-const SideMenuList: React.FC<{
-  threadlist: ThreadsPropsType[];
-  userid: string;
-}> = ({ threadlist, userid}) => {
-  console.log(userid);
-  // const menulist = ["仕事","新規作成"]
-  // const menupath = [`${process.env.NEXT_PUBLIC_ROOTPATH}/thread/1`,`${process.env.NEXT_PUBLIC_ROOTPATH}/thread/2`]
+const SideMenuList = (props: SideMenuPropsType) => {
   return (
     <>
       <List>
-        <ListItem key="threadcreate" disablePadding>
-          {/* <ListItemButton onClick={}> */}
-          <ListItemButton>
-            <ThreadPopup userid={userid} />
-          </ListItemButton>
-          <ListItemButton>
-            <PDFPopUp userid={userid} />
-          </ListItemButton>
-        </ListItem>
-        {threadlist.map((thread) => (
+        {props.PopUpData && (
+          <ListItem key="threadcreate" disablePadding>
+            {/* <ListItemButton onClick={}> */}
+            <Tooltip
+              title="Thread作成"
+              placement="bottom"
+              arrow={true}
+            >
+              <ListItemButton>
+                <ThreadPopup
+                  userid={props.userid}
+                  collectionlist={props.PopUpData.CollectionList}
+                  groupid={props.PopUpData.GroupId}
+                />
+              </ListItemButton>
+            </Tooltip>
+            <Tooltip
+              title="PDFアップロード"
+              placement="bottom"
+              arrow={true}
+            >
+            <ListItemButton>
+              <PDFPopUp
+                userid={props.userid}
+                collectionlist={props.PopUpData.CollectionList}
+              />
+            </ListItemButton>
+            </Tooltip>
+          </ListItem>
+        )}
+        {props.threadlist.map((thread) => (
           <ListItem key={thread.name} disablePadding>
             <ListItemButton>
               <Link
-                href={`${process.env.NEXT_PUBLIC_ROOTPATH}/thread/${thread.id}`}
+                href={`${process.env.NEXTAUTH_URL}/thread/${thread.id}`}
                 key={thread.name}
                 underline="none"
               >

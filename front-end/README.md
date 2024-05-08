@@ -21,6 +21,10 @@ VSCode及びDocker(Docker Desktop)が導入済みかつ，VSCodeの拡張機能�
 docker compose up -d
 ```
 
+## 初期設定
+api側のグループとUserが作成済みかつapi側のUserと同一のnameを持つKeycloakアカウントを用意する
+また，`front-end/chat`に`.env.local`を用意する．`.env.local.sample`を参考に，IPアドレスの部分は，コンテナを動かしているホストマシンのLAN内IPを書く
+
 ## アクセス
-ブラウザから`localhost:3000`にアクセスすることで確認できる．
+ブラウザから`IPアドレス:3000`にアクセスすることで確認できる．
 コンテナ内で編集を行った場合，即座に反映される(ホットリロード)

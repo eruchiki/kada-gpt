@@ -1,12 +1,12 @@
 import axios from "axios";
 
-const DocumentAdd = async (userid:number, collectionid: number, FileData: any, event: any) => {
-  event.preventDefault();
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/chat/collections/${collectionid}?create_user_id=${userid}`;
-  if (FileData) {
+export const POST = async (request: Request) => {
+  const Data = await request.json();
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/chat/collections/${Data.collectionid}?create_user_id=${Data.userid}`;
+  if (Data.FileData) {
     const formData = new FormData();
-    for (let i = 0; i < FileData.length; i++) {
-      formData.append('files', FileData[i]);
+    for (let i = 0; i < Data.FileData.length; i++) {
+      formData.append("files", Data.FileData[i]);
     }
     return await axios
       .post(url, formData, {
@@ -24,4 +24,4 @@ const DocumentAdd = async (userid:number, collectionid: number, FileData: any, e
   }
 };
 
-export default DocumentAdd;
+

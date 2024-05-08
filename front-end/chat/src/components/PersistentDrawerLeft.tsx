@@ -43,7 +43,7 @@ const PersistentDrawerLeft = (props:SideMenuPropsTypewithThreads)  => {
             {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         <Divider />
-        <SideMenuList threadlist={props.threadlist} userid={props.userid}/>
+        <SideMenuList threadlist={props.threadlist} userid={props.userid} PopUpData={props.PopUpData}/>
       </Drawer>
       </>
   );

@@ -1,6 +1,5 @@
 .DS_Store
 __pycache__/
-.env
 .env.prod
 .venv
 dev.env

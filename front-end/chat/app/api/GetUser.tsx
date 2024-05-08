@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const GetUser = async (userid: string) => {
+const GetUser = async (userid: number) => {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/chat/users/${userid}`;
   return await axios
     .get(url)
