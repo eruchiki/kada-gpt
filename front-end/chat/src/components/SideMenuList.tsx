@@ -1,7 +1,7 @@
 import React from "react";
 import { List, Link, ListItem,  ListItemButton, ListItemIcon } from "@mui/material";
 import ThreadPopup from "./Thread/ThreadPopUp"
-import PDFPopUp from "./PDF/PDFPopUp"
+import HomeButton from "./HomeButton"
 import Tooltip from "@mui/material/Tooltip";
 
 type SideMenuPropsType = {
@@ -15,22 +15,19 @@ const SideMenuList = (props: SideMenuPropsType) => {
     <>
       <List>
         {props.PopUpData && (
-          <ListItem key="threadcreate" disablePadding>
-            {/* <ListItemButton onClick={}> */}
-            <Tooltip
-              title="Thread作成"
-              placement="bottom"
-              arrow={true}
-            >
-              <ListItemButton>
-                <ThreadPopup
-                  userid={props.userid}
-                  collectionlist={props.PopUpData.CollectionList}
-                  groupid={props.PopUpData.GroupId}
-                />
-              </ListItemButton>
-            </Tooltip>
-            <Tooltip
+          <>
+            <ListItem key="threadcreate" disablePadding>
+              {/* <ListItemButton onClick={}> */}
+              <Tooltip title="Thread作成" placement="bottom" arrow={true}>
+                <ListItemButton>
+                  <ThreadPopup
+                    userid={props.userid}
+                    collectionlist={props.PopUpData.CollectionList}
+                    groupid={props.PopUpData.GroupId}
+                  />
+                </ListItemButton>
+              </Tooltip>
+              {/* <Tooltip
               title="PDFアップロード"
               placement="bottom"
               arrow={true}
@@ -41,8 +38,14 @@ const SideMenuList = (props: SideMenuPropsType) => {
                 collectionlist={props.PopUpData.CollectionList}
               />
             </ListItemButton>
-            </Tooltip>
-          </ListItem>
+            </Tooltip> */}
+            </ListItem>
+            <ListItem key="home" disablePadding>
+              <ListItemButton>
+                <HomeButton />
+              </ListItemButton>
+            </ListItem>
+          </>
         )}
         {props.threadlist.map((thread) => (
           <ListItem key={thread.name} disablePadding>

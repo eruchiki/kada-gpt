@@ -8,9 +8,10 @@ interface PromptInputProps {
   prompt: string;
   onSubmit: () => void;
   updatePrompt: (prompt: string) => void;
+  Disabled: boolean;
 }
 
-const PromptInput: React.FC<PromptInputProps> = ({ prompt, onSubmit, updatePrompt }) => {
+const PromptInput: React.FC<PromptInputProps> = ({ prompt, onSubmit, updatePrompt, Disabled }) => {
   const checkKeyPress = useCallback((e: KeyboardEvent) => {
      if (e.key === "Enter" && e.code !== "Enter") {
        // 日本語変換中のEnterキーが押されたときの処理
@@ -41,7 +42,7 @@ const PromptInput: React.FC<PromptInputProps> = ({ prompt, onSubmit, updatePromp
     <ContentEditable
       innerRef={contentEditableRef}
       html={prompt}
-      disabled={false}
+      disabled={Disabled}
       id="prompt-input"
       className="prompt-input"
       onChange={(event) => updatePrompt(event.target.value)}

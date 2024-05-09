@@ -11,6 +11,7 @@ import axios from "axios";
 
 const SendMessage = async (Props: ChatPropsType) => {
   const url = `api/chat`;
+  Props.setDisable(true)
   const response =  await axios
     .post(url, {prompt:Props.prompt,ThreadInfo:Props.ThreadInfo,userid:Props.userid})
     .then((response) => {
@@ -22,6 +23,7 @@ const SendMessage = async (Props: ChatPropsType) => {
     })
   Props.setData(response.data);
   Props.setPrompt("");
+  Props.setDisable(false);
 };
 
 const Chat = (props: ChatPramasPropsType) => {
@@ -29,6 +31,7 @@ const Chat = (props: ChatPramasPropsType) => {
   const [ChatHistory, setChatHistory] = useState<ChatHisotryPropsType[]>(
     props.ChatHistory
   );
+  const [Disabled, setDisabled] = useState<boolean>(false)
   return (
     <div className="App">
       <div id="response-list">
@@ -43,6 +46,7 @@ const Chat = (props: ChatPramasPropsType) => {
             SendMessage({
               setData: setChatHistory,
               setPrompt: setPrompt,
+              setDisable: setDisabled,
               prompt,
               ThreadInfo: props.ThreadInfo,
               userid: props.SessionUser.id,
@@ -50,6 +54,7 @@ const Chat = (props: ChatPramasPropsType) => {
           }
           key="prompt-input"
           updatePrompt={(prompt) => setPrompt(prompt)}
+          Disabled={Disabled}
         />
         <button
           id="submit-button"
@@ -58,6 +63,7 @@ const Chat = (props: ChatPramasPropsType) => {
             SendMessage({
               setData: setChatHistory,
               setPrompt: setPrompt,
+              setDisable: setDisabled,
               prompt,
               ThreadInfo: props.ThreadInfo,
               userid: props.SessionUser.id,
