@@ -23,6 +23,11 @@ RUN apt-get -y update && \
   apt-get install -y wget && \
   apt-get install -y sudo
 
+# Neologd
+RUN git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git && \
+  cd mecab-ipadic-neologd && \
+  ./bin/install-mecab-ipadic-neologd -n -y
+
 # poetryの定義ファイルをコピー (存在する場合)
 COPY pyproject.toml* poetry.lock* ./
 
