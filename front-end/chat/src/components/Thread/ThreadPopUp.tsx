@@ -47,13 +47,13 @@ const ThreadPopUp = (props: ThreadPopUpPropsType) => {
       setRelateNum(4),
       setSearchMethod("default"),
       setOpen(false);
-      router.push(`/`);
+    // router.push(`/`);
+      router.refresh();
   };
   const handleCreate = async (ThreadInfo: any, event: any) => {
     await CreateThread(ThreadInfo, event).then((CreateData) => {
       handleClose();
       // router.push(`/thread/${CreateData.id}`);
-      router.push(`/`);
     }
     );
   }
