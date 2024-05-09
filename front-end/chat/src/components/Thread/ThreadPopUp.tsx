@@ -33,14 +33,14 @@ const ThreadPopUp = (props: ThreadPopUpPropsType) => {
   // console.log(typeof userid.userid);
   const [open, setOpen] = React.useState(false);
   const [ThreadName, setThreadName] = React.useState<string>("");
-  const [LLMModel, setLLMModel] = React.useState<string>("gpt4");
-  const [Collections, setCollections] = React.useState<number>(0);
+  const [LLMModel, setLLMModel] = React.useState<string>("gpt-4-turbo");
+  const [Collections, setCollections] = React.useState<number>(1);
   const [RelateNum, setRelateNum] = React.useState<number>(4);
   const [SearchMethod, setSearchMethod] = React.useState<string>("default");
   const handleClickOpen = () => {
     setOpen(true);
   };
-  const handleClose =  (id:number) => {
+  const handleClose =  () => {
       setThreadName(""),
       setCollections(0),
       setLLMModel("gpt4"),
@@ -51,7 +51,9 @@ const ThreadPopUp = (props: ThreadPopUpPropsType) => {
   };
   const handleCreate = async (ThreadInfo: any, event: any) => {
     await CreateThread(ThreadInfo, event).then((CreateData) => {
-      handleClose(CreateData.id)
+      handleClose();
+      // router.push(`/thread/${CreateData.id}`);
+      router.push(`/`);
     }
     );
   }
@@ -81,7 +83,7 @@ const ThreadPopUp = (props: ThreadPopUpPropsType) => {
         <Box sx={{ p: 2 }}>
           <TextForm title="名前" data={ThreadName} setData={setThreadName} />
         </Box>
-        <Box sx={{ p: 1 }}>
+        <Box sx={{ p: 2 }}>
           <SelectForm
             label="LLMモデル"
             data={LLMModel}
@@ -89,7 +91,7 @@ const ThreadPopUp = (props: ThreadPopUpPropsType) => {
             setData={setLLMModel}
           />
         </Box>
-        <Box sx={{ p: 5 }}>
+        <Box sx={{ p: 2 }}>
           <SelectForm
             label="関連情報数"
             data={RelateNum}
@@ -97,7 +99,7 @@ const ThreadPopUp = (props: ThreadPopUpPropsType) => {
             setData={setRelateNum}
           />
         </Box>
-        <Box sx={{ p: 1 }}>
+        <Box sx={{ p: 2 }}>
           <SelectForm
             label="コレクション（ベクトルDB）"
             data={Collections}
@@ -105,7 +107,7 @@ const ThreadPopUp = (props: ThreadPopUpPropsType) => {
             setData={setCollections}
           />
         </Box>
-        <Box sx={{ p: 1 }}>
+        <Box sx={{ p: 2 }}>
           <SelectForm
             label="手法"
             data={SearchMethod}

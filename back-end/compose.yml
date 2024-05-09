@@ -4,6 +4,7 @@ services:
       context: ./fastapi/
       dockerfile: Dockerfile
     restart: always
+    container_name: api
     volumes:
       - api-venv:/src/.venv
       - ./fastapi:/src
@@ -21,7 +22,7 @@ services:
       - db
       - vector-store
     env_file:
-      - .env
+      - prod.env
     logging:
       driver: json-file
       options:
