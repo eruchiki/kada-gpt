@@ -47,7 +47,6 @@ const PageAPI = async (ThreadId:number) => {
 export default async function ThreadPage({ params }: { params: { id: number } }) {
   const ThreadId = params.id;
   const Data = await PageAPI(ThreadId)
-  console.log(Data)
   // const ThreadInfo = await GetThread(session?.user?.email, ThreadId);
   // try {
   //   const session = await getServerSession(authOptions);

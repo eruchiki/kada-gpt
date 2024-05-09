@@ -2,7 +2,7 @@ import React from "react";
 import { List, Link, ListItem,  ListItemButton, ListItemIcon } from "@mui/material";
 import ThreadPopup from "./Thread/ThreadPopUp"
 import PDFPopUp from "./PDF/PDFPopUp"
-import PopUpFunction from "../../app/api/PopUpAPI"
+import Tooltip from "@mui/material/Tooltip";
 
 type SideMenuPropsType = {
   userid: number;
@@ -17,19 +17,31 @@ const SideMenuList = (props: SideMenuPropsType) => {
         {props.PopUpData && (
           <ListItem key="threadcreate" disablePadding>
             {/* <ListItemButton onClick={}> */}
-            <ListItemButton>
-              <ThreadPopup
-                userid={props.userid}
-                collectionlist={props.PopUpData.CollectionList}
-                groupid={props.PopUpData.GroupId}
-              />
-            </ListItemButton>
+            <Tooltip
+              title="Thread作成"
+              placement="bottom"
+              arrow={true}
+            >
+              <ListItemButton>
+                <ThreadPopup
+                  userid={props.userid}
+                  collectionlist={props.PopUpData.CollectionList}
+                  groupid={props.PopUpData.GroupId}
+                />
+              </ListItemButton>
+            </Tooltip>
+            {/* <Tooltip
+              title="PDFアップロード"
+              placement="bottom"
+              arrow={true}
+            >
             <ListItemButton>
               <PDFPopUp
                 userid={props.userid}
                 collectionlist={props.PopUpData.CollectionList}
               />
             </ListItemButton>
+            </Tooltip> */}
           </ListItem>
         )}
         {props.threadlist.map((thread) => (
