@@ -40,22 +40,20 @@ const ThreadPopUp = (props: ThreadPopUpPropsType) => {
   const handleClickOpen = () => {
     setOpen(true);
   };
-  const handleClose = () => {
-    setOpen(false);
+  const handleClose =  (id:number) => {
+      setThreadName(""),
+      setCollections(0),
+      setLLMModel("gpt4"),
+      setRelateNum(4),
+      setSearchMethod("default"),
+      setOpen(false);
+      router.push(`/`);
   };
   const handleCreate = async (ThreadInfo: any, event: any) => {
-    const CreateData = await CreateThread(
-               ThreadInfo,
-                event
+    await CreateThread(ThreadInfo, event).then((CreateData) => {
+      handleClose(CreateData.id)
+    }
     );
-    console.log(CreateData)
-    handleClose();
-    setThreadName("")
-    setCollections(0)
-    setLLMModel("gpt4")
-    setRelateNum(4)
-    setSearchMethod("default")
-    router.push(`/thread/${CreateData.id}`);
   }
   const LLMModelList = [
     { id: "gpt-3.5-turbo", name: "gpt3" },

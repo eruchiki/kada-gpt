@@ -30,7 +30,7 @@ const SideMenuList = (props: SideMenuPropsType) => {
                 />
               </ListItemButton>
             </Tooltip>
-            <Tooltip
+            {/* <Tooltip
               title="PDFアップロード"
               placement="bottom"
               arrow={true}
@@ -41,7 +41,7 @@ const SideMenuList = (props: SideMenuPropsType) => {
                 collectionlist={props.PopUpData.CollectionList}
               />
             </ListItemButton>
-            </Tooltip>
+            </Tooltip> */}
           </ListItem>
         )}
         {props.threadlist.map((thread) => (
