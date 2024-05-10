@@ -1,0 +1,89 @@
+services:
+  api:
+    build:
+      context: ./fastapi/
+      dockerfile: Dockerfile
+    restart: always
+    container_name: api
+    volumes:
+      - api-venv:/src/.venv
+      - ./fastapi:/src
+      - ./log/api:/log
+    entrypoint:
+      - poetry
+      - run
+      - gunicorn
+      - api.main:app
+      - --config
+      - gunicorn.config.py
+    networks:
+      - kada-gpt
+    depends_on:
+      - db
+      - vector-store
+    env_file:
+      - prod.env
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: '10'
+
+  proxy:
+    image: nginx:1.25.3-alpine
+    container_name: proxy
+    restart: always
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./log/proxy:/var/log/nginx
+    depends_on:
+      - api
+    networks:
+      - kada-gpt
+    ports:
+      - "8080:80"
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: '10'
+
+  vector-store:
+    image: qdrant/qdrant:v1.6.1
+    restart: always
+    volumes:
+      - ./qdrant/storage:/qdrant/storage
+      - ./qdrant/snapshots:/qdrant/snapshots
+    networks:
+      - kada-gpt
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: '10'
+
+  db:
+    image: mariadb:10.11.6-jammy  # ltsを選択
+    restart: always
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'  # rootアカウントをパスワードなしで作成
+      MYSQL_DATABASE: 'api'
+      TZ: 'Asia/Tokyo'  # タイムゾーンを日本時間に設定
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci  # 文字コードを指定
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+    networks:
+      - kada-gpt
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: '10'
+
+volumes:
+  api-venv:
+
+networks:
+  kada-gpt:
+    name: kada-gpt
+    driver: bridge

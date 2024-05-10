@@ -1,17 +1,62 @@
 .DS_Store
-/jupyterlab/settings/*
-!/jupyterlab/settings/.gitkeep
-.ipynb_checkpoints/
-.Trash-0/
-/.env
 __pycache__/
-pdf_data/
-pdf_to_text/
-data/
-process_data/
-reference_data/
-reference_files/
-storage/
-storage_context/
-log.json
-logs/
+.env.prod
+.venv
+dev.env
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.vscode-server/
+.mypy_cache/
+.cache/
+.dotnet/
+.bash_history
+pdf_files/
+log/
+back-end/mysql/data/
+back-end/qdrant/
+*.pdf
+.*_history
+.ssh
+.gnupg
+.gitconfig
+prod.env
+
+# Front end
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/front-end/chat/node_modules
+/front-end/chat/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+/front-end/chat/coverage
+
+# next.js
+/front-end/chat/.next/
+/front-end/chat/out/
+
+# production
+/front-end/chat/build
+
+# misc
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts

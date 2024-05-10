@@ -1,0 +1,1 @@
+{'_sa_instance_state': <sqlalchemy.orm.state.InstanceState object at 0x7f8185a4cbf0>, 'collection_id': 1, 'create_user_id': 1, 'uri': 'pdf_files/1/20240408201642021385_原稿_v3_FIN.pdf', 'publish': True, 'id': 1, 'created_at': datetime.datetime(2024, 4, 8, 20, 16, 42)}
