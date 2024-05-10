@@ -53,3 +53,9 @@ VSCode及びDocker(Docker Desktop)が導入済みかつ，VSCodeの拡張機能�
 ```bash
 docker compose up -d
 ```
+
+## 初期化
+開発コンテナのターミナルを開き，ワークスペースのルートで
+```
+python -m api.migrate_all
+```

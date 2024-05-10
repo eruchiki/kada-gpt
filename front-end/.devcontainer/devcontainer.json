@@ -1,0 +1,31 @@
+{
+  "name": "Docker-Next.js",
+  "dockerComposeFile": [
+    "../compose.dev.yml",
+    "compose.extend.yml"
+  ],
+  "service": "app",
+  "workspaceFolder": "/app",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "xabikos.javascriptsnippets"
+      ],
+      "settings": {
+        "files.autoSave": "afterDelay",
+        "editor.tabSize": 2,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnType": true,
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "always"
+        },
+        "eslint.alwaysShowStatus": true
+      }
+    }
+  },
+  "shutdownAction": "stopCompose"
+}
