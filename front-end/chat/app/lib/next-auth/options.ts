@@ -42,6 +42,7 @@ export const authOptions: NextAuthOptions = {
         .then((response) => {
           const user = response.data.find((d: any) =>  d.name === session.user?.name);
           session.user.id = user.id;
+          session.user.group = user.group_id;
           return session;
         })
         .catch((error) => {

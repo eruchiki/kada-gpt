@@ -50,6 +50,19 @@ async def get_thread_all(
     return await cruds.get_all_thread(db, user_id)
 
 
+# スレッド一覧取得(group id条件)
+@router.get(
+    "/chat/users/{user_id}/{group_id}/thread",
+    response_model=List[schema.DisplayResponseThread],
+)
+async def get_thread_all_group(
+    user_id: int,
+    group_id: int,
+    db: AsyncSession = Depends(get_db),
+) -> schema.DisplayResponseThread:
+    return await cruds.get_all_thread_group(db, group_id)
+
+
 # スレッド削除
 @router.delete(
     "/chat/users/{user_id}/thread/{thread_id}",
