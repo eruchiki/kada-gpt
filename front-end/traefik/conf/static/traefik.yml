@@ -1,0 +1,29 @@
+providers:
+  docker:
+    exposedByDefault: false # 無差別にコンテナを吸わないようにする
+    network: kada-gpt
+  file:
+    directory: "/etc/traefik/dynamic-conf/"
+    watch: true
+
+entryPoints:
+  web:
+    address: ":80"
+
+log:
+  filePath: "/dev/stdout"
+  format: json
+  level: ERROR
+
+accessLog:
+  filePath: "/dev/stdout"
+  format: json
+  filters:
+    statusCodes:
+      - "400-431"
+      - "500-511"
+    retryAttempts: true
+    minDuration: "1000ms"
+  fields:
+    names:
+      StartUTC: drop

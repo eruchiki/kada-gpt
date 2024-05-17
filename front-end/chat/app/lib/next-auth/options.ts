@@ -31,7 +31,7 @@ export const authOptions: NextAuthOptions = {
     KeycloakProvider({
       clientId: "frontend_app",
       clientSecret: process.env.KC_KADAGPT_SECRET!,
-      issuer: `http://${process.env.START_IP!}:8081/realms/KadaGPT`,
+      issuer: `${process.env.KEYCLOAK_URL!}/realms/KadaGPT`,
     }),
   ],
   callbacks: {
