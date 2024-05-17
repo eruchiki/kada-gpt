@@ -43,7 +43,7 @@ const ThreadPopUp = (props: ThreadPopUpPropsType) => {
   const handleClose =  () => {
       setThreadName(""),
       setCollections(0),
-      setLLMModel("gpt4"),
+      setLLMModel("gpt-4"),
       setRelateNum(4),
       setSearchMethod("default"),
       setOpen(false);
@@ -52,14 +52,20 @@ const ThreadPopUp = (props: ThreadPopUpPropsType) => {
   };
   const handleCreate = async (ThreadInfo: any, event: any) => {
     await CreateThread(ThreadInfo, event).then((CreateData) => {
-      handleClose();
-      // router.push(`/thread/${CreateData.id}`);
+      setThreadName(""),
+      setCollections(0),
+      setLLMModel("gpt-4"),
+      setRelateNum(4),
+      setSearchMethod("default"),
+      setOpen(false);
+      router.push(`/thread/${CreateData.id}`);
     }
     );
   }
   const LLMModelList = [
-    { id: "gpt-3.5-turbo", name: "gpt3" },
-    { id: "gpt-4-turbo", name: "gpt4" },
+    { id: "gpt-3.5-turbo", name: "gpt-3" },
+    { id: "gpt-4-turbo", name: "gpt-4" },
+    { id: "gpt-4o", name: "gpt-4o" },
   ];
   const RelateNumList = [
     { id: 1, name: 1 },

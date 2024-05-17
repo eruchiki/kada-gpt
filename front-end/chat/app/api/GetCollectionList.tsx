@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const GetCollectionList = async () => {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/chat/collections`;
+const GetCollectionList = async (group_id:number) => {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/chat/collections/${group_id}`;
   return await axios
     .get(url)
     .then((response) => {
