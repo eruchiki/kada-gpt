@@ -76,9 +76,9 @@ services:
         max-file: '10'
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.keycloak-admin.rule=Host(`${FQDN}`)&&PathPrefix(`/keycloak/admin`)"
+      - "traefik.http.routers.keycloak-admin.rule=PathPrefix(`/keycloak/admin`)"
       - "traefik.http.routers.keycloak-admin.entrypoints=web"
-      - "traefik.http.routers.keycloak.rule=Host(`${FQDN}`)&&PathPrefix(`/keycloak`)"
+      - "traefik.http.routers.keycloak.rule=PathPrefix(`/keycloak`)"
       - "traefik.http.routers.keycloak.entrypoints=web"
 
   auth-db:
