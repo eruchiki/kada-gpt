@@ -93,7 +93,7 @@ async def get_documents(
 # 特定のドキュメント取得
 @router.get(
     "/chat/collections/{collection_id}/{document_id}",
-    response_model=FileResponse,
+    response_model=List[Any],
 )
 async def get_document(
     collection_id: int,
