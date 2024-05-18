@@ -1,6 +1,8 @@
 #!/bin/bash
 
-/opt/keycloak/bin/kcadm.sh config credentials --server http://localhost:8081 --realm master --user admin --password hogehoge
+/opt/keycloak/bin/kcadm.sh config credentials --server http://localhost:8080/keycloak --realm master --user admin --password hogehoge
+/opt/keycloak/bin/kcadm.sh update realms/master -s sslRequired=NONE
+/opt/keycloak/bin/kcadm.sh update realms/KadaGPT -s sslRequired=NONE
 /opt/keycloak/bin/kcadm.sh create users -r KadaGPT -f - << EOF
 {
   "username": "ganbon",
