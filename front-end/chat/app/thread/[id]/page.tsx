@@ -10,6 +10,7 @@ import PopUpFunction from "../../api/PopUpAPI";
 type SessionUser<T> = T & {
   name?: string | null | undefined;
   id?: string | null | undefined;
+  group?: string | null | undefined;
   email?: string | null | undefined;
   image?: string | null | undefined;
 };
@@ -20,7 +21,7 @@ const PageAPI = async (ThreadId:number) => {
   if (user) {
     const threadInfo = await GetThread(user?.id, ThreadId);
     const PopupData = await PopUpFunction(user?.id);
-    const threadlist = await GetThreadList(user?.id);
+    const threadlist = await GetThreadList(user?.id,PopupData.GroupId);
     const chathistory = await GetChatHistory(user?.id, ThreadId); 
     return {
       user: user,

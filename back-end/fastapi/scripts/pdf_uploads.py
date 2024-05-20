@@ -3,9 +3,9 @@ import requests
 
 
 # 自分のuserIdに変更
-USER_ID = 0
+USER_ID = 1
 # 格納したいcollection idに変更
-COLLECTION_ID = 0
+COLLECTION_ID = 1
 
 
 url = f"http://localhost:8000/chat/collections/{COLLECTION_ID}?create_user_id={USER_ID}"

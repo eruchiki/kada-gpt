@@ -51,6 +51,7 @@ class Groups(Base):
     publish = Column(Boolean, default=True)
     user = relationship("Users", back_populates="group")
     thread = relationship("Threads", back_populates="group")
+    collection = relationship("Collections", back_populates="group")
 
 
 class Threads(Base):
@@ -106,6 +107,7 @@ class Collections(Base):
     __tablename__ = "collections"
 
     id = Column(Integer, primary_key=True)
+    group_id = Column(Integer, ForeignKey("groups.id"))
     create_user_id = Column(Integer, ForeignKey("users.id"))
     name = Column(String(1024))
     created_at = Column(
@@ -117,6 +119,7 @@ class Collections(Base):
     publish = Column(Boolean, default=True)
     user = relationship("Users", back_populates="collection")
     thread = relationship("Threads", back_populates="collection")
+    group = relationship("Groups", back_populates="collection")
     document = relationship("Documents", back_populates="collection")
     chat = relationship("Chat", back_populates="collection")
 

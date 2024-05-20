@@ -4,6 +4,7 @@ from datetime import datetime
 
 class CollectionBase(BaseModel):
     name: str = Field(None, json_schema_extra={"example": "テスト"})
+    group_id: int
     create_user_id: int
 
 

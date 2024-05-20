@@ -660,8 +660,8 @@
       "clientId": "frontend_app",
       "name": "frontend_app",
       "description": "",
-      "rootUrl": "http://${START_IP}:3000/",
-      "adminUrl": "http://${START_IP}:3000/",
+      "rootUrl": "http://${FQDN}/",
+      "adminUrl": "http://${FQDN}/",
       "baseUrl": "",
       "surrogateAuthRequired": false,
       "enabled": true,
@@ -669,11 +669,10 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "${KC_KADAGPT_SECRET}",
       "redirectUris": [
-        "http://localhost:3000/api/auth/callback/keycloak",
-        "http://${START_IP}:3000/api/auth/callback/keycloak"
+        "http://${FQDN}/api/auth/callback/keycloak"
       ],
       "webOrigins": [
-        "http://${START_IP}:3000/"
+        "http://${FQDN}/"
       ],
       "notBefore": 0,
       "bearerOnly": false,

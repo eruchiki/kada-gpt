@@ -8,6 +8,7 @@ import PopUpFunction from "./api/PopUpAPI";
 type SessionUser<T> = T & {
   name?: string | null | undefined;
   id?: string | null | undefined;
+  group?: string | null | undefined;
   email?: string | null | undefined;
   image?: string | null | undefined;
 }; 
@@ -16,9 +17,9 @@ const PageAPI = async () => {
   const ServerSession = await getServerSession(authOptions);
   const user: SessionUser<Session.uesr> = ServerSession?.user;
   if (user) {
-    const threadlist = await GetThreadList(user?.id);
     const PopupData = await PopUpFunction(user?.id);
-    return {user:user, threadlist:threadlist, PopupData:PopupData}
+    const threadlist = await GetThreadList(user?.id,PopupData.GroupId);
+    return { user: user, threadlist: threadlist, PopupData: PopupData }
   } else{
     const threadlist = []
     const PopupData = null

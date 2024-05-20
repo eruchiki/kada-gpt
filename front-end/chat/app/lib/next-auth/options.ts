@@ -31,7 +31,7 @@ export const authOptions: NextAuthOptions = {
     KeycloakProvider({
       clientId: "frontend_app",
       clientSecret: process.env.KC_KADAGPT_SECRET!,
-      issuer: `http://${process.env.START_IP!}:8081/realms/KadaGPT`,
+      issuer: `${process.env.KEYCLOAK_URL!}/realms/KadaGPT`,
     }),
   ],
   callbacks: {
@@ -42,6 +42,7 @@ export const authOptions: NextAuthOptions = {
         .then((response) => {
           const user = response.data.find((d: any) =>  d.name === session.user?.name);
           session.user.id = user.id;
+          session.user.group = user.group_id;
           return session;
         })
         .catch((error) => {

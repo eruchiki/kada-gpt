@@ -40,26 +40,31 @@ const ThreadPopUp = (props: ThreadPopUpPropsType) => {
   const handleClickOpen = () => {
     setOpen(true);
   };
-  const handleClose =  () => {
-      setThreadName(""),
+  const handleClose = () => {
+    setThreadName(""),
       setCollections(0),
-      setLLMModel("gpt4"),
+      setLLMModel("gpt-4"),
       setRelateNum(4),
       setSearchMethod("default"),
       setOpen(false);
     // router.push(`/`);
-      router.refresh();
+    router.refresh();
   };
   const handleCreate = async (ThreadInfo: any, event: any) => {
     await CreateThread(ThreadInfo, event).then((CreateData) => {
-      handleClose();
-      // router.push(`/thread/${CreateData.id}`);
-    }
-    );
-  }
+      setThreadName(""),
+        setCollections(0),
+        setLLMModel("gpt-4"),
+        setRelateNum(4),
+        setSearchMethod("default"),
+        setOpen(false);
+      router.push(`/thread/${CreateData.id}`);
+    });
+  };
   const LLMModelList = [
-    { id: "gpt-3.5-turbo", name: "gpt3" },
-    { id: "gpt-4-turbo", name: "gpt4" },
+    { id: "gpt-3.5-turbo", name: "gpt-3" },
+    { id: "gpt-4-turbo", name: "gpt-4" },
+    { id: "gpt-4o", name: "gpt-4o" },
   ];
   const RelateNumList = [
     { id: 1, name: 1 },
@@ -118,7 +123,9 @@ const ThreadPopUp = (props: ThreadPopUpPropsType) => {
         <DialogActions>
           <Button onClick={handleClose}>閉じる</Button>
           <Button
-            onClick={(e) => {handleCreate({
+            onClick={(e) => {
+              handleCreate(
+                {
                   name: ThreadName,
                   model_name: LLMModel,
                   relate_num: RelateNum,
@@ -127,7 +134,8 @@ const ThreadPopUp = (props: ThreadPopUpPropsType) => {
                   create_user_id: props.userid,
                   group_id: props.groupid,
                 },
-                e)
+                e
+              );
             }}
           >
             作成
