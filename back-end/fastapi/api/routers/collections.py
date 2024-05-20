@@ -28,12 +28,14 @@ async def create_collection(
 
 # コレクション一覧取得
 @router.get(
-    "/chat/collections", response_model=List[schemas.ResponseCollectionBase]
+    "/chat/collections/{group_id}",
+    response_model=List[schemas.ResponseCollectionBase]
 )
 async def get_collection(
-    db: AsyncSession = Depends(get_db),
+    group_id: int,
+    db: AsyncSession = Depends(get_db)
 ) -> List[schemas.ResponseCollectionBase]:
-    colection_list = await cruds.get_all_collection(db)
+    colection_list = await cruds.get_all_collection(db, group_id)
     return colection_list
 
 

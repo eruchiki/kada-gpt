@@ -1,5 +1,5 @@
 import { Select, MenuItem, InputLabel, Container, FormHelperText, FormControl } from "@mui/material";
-import { React, useState } from "react";
+import { useState } from "react";
 import SelectPropsType from "../types/SelectProps";
 
 const SelectForm = (props: SelectPropsType) => {

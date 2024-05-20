@@ -45,6 +45,30 @@ async def get_all_thread(
     return result.all()
 
 
+# 全スレッド取得(group指定)
+async def get_all_thread_group(
+    db: AsyncSession,
+    group_id: int,
+) -> Optional[List[Tuple[thread_schema.DisplayResponseThread]]]:
+    result: Result = await db.execute(
+        select(
+            model.Threads.id,
+            model.Threads.group_id,
+            model.Threads.name,
+            model.Threads.model_name,
+            model.Threads.relate_num,
+            model.Threads.search_method,
+            model.Threads.created_at,
+            model.Threads.update_at,
+            model.Threads.collections_id,
+            model.Collections.name.label("collection_name"),
+        )
+        .outerjoin(model.Collections)
+        .filter(model.Threads.publish, model.Threads.group_id == group_id)
+    )
+    return result.all()
+
+
 # 特定のスレッド取得
 async def get_thread(
     db: AsyncSession, user_id: int, thread_id: int

@@ -35,7 +35,11 @@ const Chat = (props: ChatPramasPropsType) => {
   return (
     <div className="App">
       <div id="response-list">
-        <PromptResponseList responseList={ChatHistory} key="response-list" />
+        <PromptResponseList
+          responseList={ChatHistory}
+          collectionId={props.ThreadInfo.collections_id}
+          key="response-list"
+        />
       </div>
 
       <div id="model-select-container"></div>

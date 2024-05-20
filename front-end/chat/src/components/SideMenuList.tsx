@@ -1,8 +1,8 @@
 import React from "react";
-import { List, Link, ListItem,  ListItemButton, ListItemIcon } from "@mui/material";
-import ThreadPopup from "./Thread/ThreadPopUp"
-import HomeButton from "./HomeButton"
+import { List, Link, ListItem,  ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import ThreadPopup from "./Thread/ThreadPopUp";
 import Tooltip from "@mui/material/Tooltip";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 
 type SideMenuPropsType = {
   userid: number;
@@ -11,6 +11,7 @@ type SideMenuPropsType = {
 };
 
 const SideMenuList = (props: SideMenuPropsType) => {
+  
   return (
     <>
       <List>
@@ -41,22 +42,35 @@ const SideMenuList = (props: SideMenuPropsType) => {
             </Tooltip> */}
             </ListItem>
             <ListItem key="home" disablePadding>
-              <ListItemButton>
-                <HomeButton />
+              <ListItemButton component="a" to="/">
+                <HomeOutlinedIcon
+                  color="primary"
+                  sx={{ fontSize: 25, marginRight: 1 }}
+                />
+                <ListItemText
+                  primary="ホーム"
+                  primaryTypographyProps={{
+                    color: "primary",
+                    fontWeight: "medium",
+                  }}
+                />
               </ListItemButton>
             </ListItem>
           </>
         )}
         {props.threadlist.map((thread) => (
           <ListItem key={thread.name} disablePadding>
-            <ListItemButton>
-              <Link
-                href={`${process.env.NEXTAUTH_URL}/thread/${thread.id}`}
-                key={thread.name}
-                underline="none"
-              >
-                {thread.name}
-              </Link>
+            <ListItemButton
+              component="a"
+              to={`/thread/${thread.id}`}
+            >
+              <ListItemText
+                primary={thread.name}
+                primaryTypographyProps={{
+                  color: "primary",
+                  fontWeight: "medium",
+                }}
+              />
             </ListItemButton>
           </ListItem>
         ))}

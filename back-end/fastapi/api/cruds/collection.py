@@ -29,15 +29,18 @@ async def create_collection(
 # 全コレクション取得
 async def get_all_collection(
     db: AsyncSession,
+    group_id: int
 ) -> Optional[List[Tuple[int, int, str, datetime, datetime]]]:
     result: Result = await db.execute(
         select(
             model.Collections.id,
+            model.Collections.group_id,
             model.Collections.create_user_id,
             model.Collections.name,
             model.Collections.created_at,
             model.Collections.update_at,
-        ).filter(model.Collections.publish)
+        ).filter(model.Collections.publish,
+                 model.Collections.group_id == group_id)
     )
     return result.all()
 

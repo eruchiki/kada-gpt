@@ -15,8 +15,6 @@ services:
       - app-vscode-server:/app/.vscode-server
       - node_modules:/app/node_modules
       - ./chat:/app
-    ports:
-      - 3000:3000
     env_file:
       - ./chat/.env
       - ./chat/.env.development
@@ -25,6 +23,13 @@ services:
     stdin_open: true
     networks:
       - kada-gpt
+    extra_hosts:
+      - "${FQDN}:172.18.0.121"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.app.entrypoints=web"
+      - "traefik.http.services.app.loadbalancer.server.port=3000"
 
   auth:
     image: quay.io/keycloak/keycloak:24.0
@@ -39,10 +44,11 @@ services:
       KC_HEALTH_ENABLED: "true"
       KEYCLOAK_ADMIN: "admin"
       KEYCLOAK_ADMIN_PASSWORD: "hogehoge"
+      KC_HOSTNAME_PATH: "/keycloak"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_RELATIVE_PATH: "/keycloak"
       KC_HTTP_ENABLED: "true"
-      KC_HTTP_PORT: "8081"
       JAVA_OPTS_APPEND: "-Xms64m -Xmx512m"
-      TEST_HOGE: "hoge"
     volumes:
       - ./auth/providers:/opt/keycloak/providers
       - ./auth/themes:/opt/keycloak/themes
@@ -53,12 +59,17 @@ services:
       - ./chat/.env.development
       - ./chat/.env.local
     networks:
-      - kada-gpt
-    ports:
-      - 8081:8081
+      kada-gpt:
+        ipv4_address: 172.18.0.120
     restart: always
     depends_on:
       - auth-db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.keycloak-admin.rule=Host(`${FQDN}`)&&PathPrefix(`/keycloak/admin`)"
+      - "traefik.http.routers.keycloak-admin.entrypoints=web"
+      - "traefik.http.routers.keycloak.rule=Host(`${FQDN}`)&&PathPrefix(`/keycloak`)"
+      - "traefik.http.routers.keycloak.entrypoints=web"
 
   auth-db:
     image: mariadb:10.11.6-jammy  # ltsを選択
@@ -73,6 +84,28 @@ services:
       - auth-mysql:/var/lib/mysql
     networks:
       - kada-gpt
+
+  traefik:
+    image: traefik:2.11.2
+    container_name: traefik
+    restart: always
+    networks:
+      kada-gpt:
+        ipv4_address: 172.18.0.121
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik/conf/static/traefik.yml:/etc/traefik/traefik.yml #静的設定ファイル
+      - ./traefik/conf/dynamic/:/etc/traefik/dynamic-conf/         #動的設定ファイル
+      - ./traefik/letsencrypt:/etc/letsencrypt
+      - ./traefik/cert:/etc/my-cert
+    env_file:
+      - ./chat/.env
+      - ./chat/.env.local
+      - ./chat/.env.production
+    ports:
+      - "80:80"
+    environment:
+      - TZ=Asia/Tokyo
 
 volumes:
   node_modules:

@@ -2,6 +2,7 @@ from sqlalchemy import create_engine
 from qdrant_client import QdrantClient
 from api.models.model import Base
 import shutil
+import os
 
 DB_URL = "mysql+pymysql://root@db:3306/api?charset=utf8"
 engine = create_engine(DB_URL, echo=True)
@@ -26,7 +27,9 @@ def reset_vectore_store() -> None:
 
 
 def reset_file_store() -> None:
-    shutil.rmtree("/src/pdf_files")
+    pdf_dir_path = "/src/pdf_files"
+    if os.path.isdir(pdf_dir_path):
+        shutil.rmtree(pdf_dir_path)
 
 
 if __name__ == "__main__":

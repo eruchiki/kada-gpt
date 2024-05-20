@@ -5,7 +5,7 @@ type ChatHisotryPropsType = {
   id: number;
   message_text: string;
   response_text: string;
-  referances: string[];
+  references: [];
   created_at: string;
   update_at: string;
   relate_num: number;
