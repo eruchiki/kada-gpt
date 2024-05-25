@@ -64,7 +64,7 @@ async def delete_collection(
     vs: QdrantClient,
     original: model.Collections,
 ) -> Optional[model.Collections]:
-    not original.publish
+    original.publish = False
     await db.commit()
     await db.refresh(original)
     collection_id = str(original.id)
@@ -145,7 +145,7 @@ async def delete_document(
     vs: QdrantClient,
     original: model.Documents,
 ) -> Optional[model.Documents]:
-    not original.publish
+    original.publish = False
     await db.commit()
     await db.refresh(original)
     document_id = str(original.id)

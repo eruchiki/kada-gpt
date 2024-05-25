@@ -79,7 +79,7 @@ async def add_documents(
 
 # ドキュメント一覧取得
 @router.get(
-    "/chat/collections/{collection_id}",
+    "/chat/collections/{collection_id}/documents",
     response_model=List[schemas.ResponseDocuments],
 )
 async def get_documents(

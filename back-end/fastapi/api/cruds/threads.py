@@ -101,10 +101,11 @@ async def update_thread(
 # スレッド削除
 async def delete_thread(
     db: AsyncSession,
+    user_id: int,
     thread_id: int,
     original: model.Threads,
 ) -> Optional[thread_schema.DeleteResponseThread]:
-    update_data = await get_thread(db, thread_id)
+    update_data = await get_thread(db, user_id, thread_id)
     if update_data is not None:
         original.publish = False
     else:

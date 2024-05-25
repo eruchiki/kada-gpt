@@ -69,13 +69,13 @@ async def get_thread_all_group(
     response_model=schema.DeleteResponseThread,
 )
 async def delate_thread(
-    thread_id: int, db: AsyncSession = Depends(get_db)
+    thread_id: int, user_id: int, db: AsyncSession = Depends(get_db)
 ) -> Optional[schema.DeleteResponseThread]:
-    before_data = await cruds.get_thread(db, thread_id)
+    before_data = await cruds.get_thread(db, user_id, thread_id)
     if before_data is None:
         raise HTTPException(status_code=404, detail=f"{thread_id} not Found")
     thread_info = await cruds.delete_thread(
-        db, thread_id, original=before_data
+        db, user_id, thread_id, original=before_data
     )
     return thread_info
 
