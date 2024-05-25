@@ -140,13 +140,37 @@ KadaGPTは，PDFから取得した情報をコレクションに蓄積します�
 3. `Execute`し，200番台のレスポンスコードと共にコレクションのIDが返却されることを確認します．
 
 #### コレクションにPDFを登録する場合
-1. `/chat/collections`のPOSTメソッドより登録を行います．
+1. `/chat/collections/{collection_id}`のPOSTメソッドより登録を行います．
 2. `collection_id`には登録対象のコレクションIDを，`create_user_id`にはPDFを登録するユーザIDを入力します．
 3. Request bodyの`files`より，アップロードしたいファイルをローカルより選択します．形式はPDFのみです．複数ファイルを選択することができます．
 4. `Execute`し，アップロードされたことを確認します．PDFファイル毎にIDが振られるはずです．
-5. `/chat/collections/{collection_id}`のGETメソッドより，コレクションに登録されているPDFを確認します．
+5. `/chat/collections/{collection_id}/documents`のGETメソッドより，コレクションに登録されているPDFを確認します．
 
 なお，PDFを更新する場合は，一度`/chat/collection/{collection_id}/{document_id}`のDELETEメソッドより当該のドキュメントを削除した後，もう一度登録手順を実施してください．
+
+### 再起動時の操作
+再起動時には，コンテナの起動を確認します．
+`~/kada-gpt/front-end`および`~/kada-gpt/back-end`で`docker compose ps -a`で起動状態を確認します．
+正常に起動していれば，`~/kada-gpt/front-end`では以下のようになっているはずです．
+```
+NAME      IMAGE                            COMMAND                  SERVICE   CREATED      STATUS      PORTS
+app       front-end-app                    "docker-entrypoint.s…"   app       7 days ago   Up 7 days
+auth      quay.io/keycloak/keycloak:24.0   "/opt/keycloak/bin/k…"   auth      7 days ago   Up 7 days   8080/tcp, 8443/tcp
+auth-db   mariadb:10.11.6-jammy            "docker-entrypoint.s…"   auth-db   7 days ago   Up 7 days   3306/tcp
+traefik   traefik:2.11.2                   "/entrypoint.sh trae…"   traefik   7 days ago   Up 7 days   0.0.0.0:80->80/tcp, :::80->80/tcp
+```
+
+また，`~/kada-gpt/back-end`では以下のようになっています．
+```
+NAME                      IMAGE                   COMMAND                  SERVICE        CREATED      STATUS      PORTS
+api                       back-end-api            "poetry run gunicorn…"   api            8 days ago   Up 8 days
+back-end-db-1             mariadb:10.11.6-jammy   "docker-entrypoint.s…"   db             8 days ago   Up 8 days   3306/tcp
+back-end-vector-store-1   qdrant/qdrant:v1.6.1    "./entrypoint.sh"        vector-store   8 days ago   Up 8 days   6333-6334/tcp
+proxy                     nginx:1.25.3-alpine     "/docker-entrypoint.…"   proxy          8 days ago   Up 8 days   0.0.0.0:8080->80/tcp, :::8080->80/tcp
+```
+
+上記のようになっていれば，自動でサービスを利用できます．
+もし起動していない場合は，`~/kada-gpt/front-end`および`~/kada-gpt/back-end`で`docker compose up -d`とコマンドを入力してください．
 
 ### ブラウザ経由のチャットを行う
 
